@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Beelivery</title>
+    <link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap"
+	rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
     <div id="app">
@@ -13,6 +21,8 @@
     <script src="js/axios.min.js"></script>
     <script src="js/httpVueLoader.js"></script>
     <script>
+
+        Vue.component('main-navigation', httpVueLoader('components/MainNavigation.vue'));
 
         const routes = [
             {
@@ -31,5 +41,34 @@
             router: router
         }).$mount('#app');
     </script>
+
+    <style>
+        body {
+            --primary: #eeba19;
+            --secondary: #ffec55;
+            --accent: #dd2c00;
+        }
+
+        .primary {
+            color: var(--primary);
+        }
+
+        .secondary {
+            color: var(--secondary);
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        p {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 </body>
 </html>
