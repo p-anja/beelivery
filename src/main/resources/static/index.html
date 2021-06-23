@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Beelivery</title>
+</head>
+<body>
+    <div id="app">
+        <router-view></router-view>
+    </div>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-router.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/httpVueLoader.js"></script>
+    <script>
+
+        const routes = [
+            {
+                path: '/',
+                Name: 'Home',
+                component: httpVueLoader('views/Home.vue'),
+            }
+        ];
+
+        const router = new VueRouter({
+            routes: routes,
+        });
+
+        new Vue({
+            el: '#app',
+            router: router
+        }).$mount('#app');
+    </script>
+</body>
+</html>
