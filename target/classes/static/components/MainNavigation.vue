@@ -13,7 +13,7 @@
 					<div id="nav-links">
 						<slot></slot>
 						<router-link v-if="jws" to="/logout">Logout</router-link>
-						<router-link v-else to="/singin">Login</router-link>
+						<router-link v-else to="/signin">Login</router-link>
 					</div>
 				</div>
 			</div>

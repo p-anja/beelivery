@@ -23,29 +23,53 @@
     <script>
 
         Vue.component('main-navigation', httpVueLoader('components/MainNavigation.vue'));
+        Vue.component('sidebar', httpVueLoader('components/Sidebar.vue'));
+        Vue.component('sorting-table', httpVueLoader('components/SortingTable.vue'), {
+            props: ["items", "headers"],
+        })
 
         const routes = [
             {
                 path: '/',
-                Name: 'Home',
+                name: 'Home',
                 component: httpVueLoader('views/Home.vue'),
             },
             {
                 path: '/signup',
-                Name: 'Signup',
+                name: 'Signup',
                 component: httpVueLoader('views/Signup.vue'),
             },
             {
                 path: '/signin',
-                Name: 'Signin',
+                name: 'Signin',
                 component: httpVueLoader('views/Signin.vue'),
             },
             {
                 path: '/userinfo',
-                Name: 'UserInfo',
+                name: 'UserInfo',
                 component: httpVueLoader('views/UserInfo.vue'),
-            }
-        ];
+            },
+            {
+                path: '/logout',
+                beforeEnter: (to, from, next) => {
+                    localStorage.jws = '';
+                    next({name: "Home"});
+                },
+            },
+
+            {
+                path: '/admin',
+                name: 'Admin',
+                component: httpVueLoader('views/Admin.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'AdminOverview',
+                        component: httpVueLoader('views/AdminOverview.vue'),
+                    },
+                ],
+            },
+        ];  
 
         const router = new VueRouter({
             routes: routes,

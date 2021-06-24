@@ -1,6 +1,8 @@
 <template>
     <div>
-        <main-navigation></main-navigation>
+        <main-navigation>
+            <router-link to="/">Home</router-link>
+        </main-navigation>
         <div id="userinfo-main">
             <div id="userinfo-container">
                 <div id="userinfo-profile">
