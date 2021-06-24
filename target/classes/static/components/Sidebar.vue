@@ -63,7 +63,7 @@
         font-weight: 500;
         background-color: var(--accent);
     }
-    #sidebar-list .router-link-active
+    #sidebar-list .router-link-exact-active
     {
         color: #111;
         font-weight: 500;
