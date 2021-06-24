@@ -39,7 +39,19 @@
                 path: '/signin',
                 Name: 'Signin',
                 component: httpVueLoader('views/Signin.vue'),
-            }
+            },
+            {
+                path: '/userinfo',
+                Name: 'UserInfo',
+                component: httpVueLoader('views/UserInfo.vue'),
+            },
+            {
+                path: '/logout',
+                beforeEnter: (to, from, next) => {
+                    localStorage.jws = '';
+                    next({name: "Home"});
+                },
+            },
         ];
 
         const router = new VueRouter({
