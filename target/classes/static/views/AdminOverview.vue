@@ -49,6 +49,10 @@ module.exports = {
         background: #fff;
     }
 
+    #overview-container h2 {
+        border-bottom: solid 1px #eee;
+    }
+
     .overview-section {
         padding: 10px;
     }

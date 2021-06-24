@@ -20,7 +20,7 @@
 
 <style scoped>
     #admin-main {
-        background: #fafafa;
+        background: var(--secondary);
         margin: 10px;
         height: 87vh;
     }
@@ -28,7 +28,7 @@
         display: flex;
         flex-direction: row;
         padding: 10px;
-        height: 100%;
+        height: 97%;
     }
     #admin-view {
         flex-grow: 1;
