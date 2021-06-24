@@ -1,10 +1,17 @@
 <template>
     <div id="sidebar">
+        <b id="sidebar-title">{{title}}</b>
         <ul id="sidebar-list">
             <li><slot></slot></li>
         </ul>
     </div>
 </template>
+
+<script>
+    module.exports = {
+        props: ["title"],
+    };
+</script>
 
 <style>
     #sidebar
@@ -21,8 +28,18 @@
         width: 10vw;
     }
 
-    li {
+    #sidebar-title
+    {
+        display: block;
+        color: #222;
+        font-weight: 500;
+        font-size: 1.5rem;
+        text-align: center;
+        padding: 8px 16px 8px 16px;
+        font-family: "Poppins", sans-serif;
+        font-weight: 400;
         border-bottom: solid 1px #eee;
+        margin-bottom: 15px;
     }
 
     li a {
@@ -46,11 +63,11 @@
         font-weight: 500;
         background-color: var(--accent);
     }
-    #sidebar-list .router-link-exact-active
+    #sidebar-list .router-link-active
     {
-        color: #fff;
+        color: #111;
         font-weight: 500;
-        background-color: var(--accent);
+        background-color: #fff;
         border-right: 2px solid var(--accent);
     }
     

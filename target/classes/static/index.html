@@ -23,7 +23,9 @@
     <script>
 
         Vue.component('main-navigation', httpVueLoader('components/MainNavigation.vue'));
-        Vue.component('sidebar', httpVueLoader('components/Sidebar.vue'));
+        Vue.component('sidebar', httpVueLoader('components/Sidebar.vue'), {
+            props: ["title"],
+        });
         Vue.component('sorting-table', httpVueLoader('components/SortingTable.vue'), {
             props: ["items", "headers"],
         })
@@ -64,8 +66,8 @@
                 children: [
                     {
                         path: '',
-                        name: 'AdminOverview',
-                        component: httpVueLoader('views/AdminOverview.vue'),
+                        name: 'AdminUsers',
+                        component: httpVueLoader('views/AdminUsers.vue'),
                     },
                 ],
             },
@@ -103,6 +105,10 @@
             padding: 0;
             margin: 0;
             font-family: 'Poppins', sans-serif;
+        }
+
+        h2 {
+            font-size: 3rem;
         }
 
         p {

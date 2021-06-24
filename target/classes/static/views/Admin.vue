@@ -5,10 +5,8 @@
         </main-navigation>
         <div id="admin-main">
             <div id="admin-container">
-                <sidebar>
-                    <router-link to="/admin/">Overview</router-link>
-                    <router-link>Restaurants</router-link>
-                    <router-link>Users</router-link>
+                <sidebar title="Admin panel">
+                    <router-link to="/admin">Users</router-link>
                 </sidebar>
                 <div id="admin-view">
                     <router-view></router-view>
