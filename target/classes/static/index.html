@@ -29,6 +29,11 @@
                 path: '/',
                 Name: 'Home',
                 component: httpVueLoader('views/Home.vue'),
+            },
+            {
+                path: '/signup',
+                Name: 'Signup',
+                component: httpVueLoader('views/Signup.vue'),
             }
         ];
 
@@ -68,6 +73,18 @@
 
         p {
             font-family: 'Poppins', sans-serif;
+        }
+
+        .error {
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+            color: #f00;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .spacer {
+            flex-grow: 1 !important;
         }
     </style>
 </body>

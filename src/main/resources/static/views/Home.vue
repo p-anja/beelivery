@@ -6,7 +6,7 @@
                 <div id="cover-moto">
                     <h1 id="moto-title">Beelivery</h1>
                     <p id="moto-text">Buzzing to keep you happy</p>
-                    <button class="button-primary">Sign up</button>
+                    <router-link class="button button-primary" to="/signup">Sign up</router-link>
                 </div>
             </div>
             <img src="img/bonnie.png" alt="Logo">
