@@ -28,7 +28,8 @@
         });
         Vue.component('sorting-table', httpVueLoader('components/SortingTable.vue'), {
             props: ["items", "headers"],
-        })
+        });
+        Vue.component('geosearch', httpVueLoader('components/GeoSearch.vue'));
 
         const routes = [
             {
