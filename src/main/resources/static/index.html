@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="css/skeleton.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
 </head>
 <body>
     <div id="app">
@@ -64,6 +67,12 @@
                     localStorage.jws = '';
                     next({name: "Home"});
                 },
+            },
+
+            {
+                path: '/restaurant/:name',
+                name: 'Restaurant',
+                component: httpVueLoader('../views/Restaurant.vue'),
             },
 
             {
