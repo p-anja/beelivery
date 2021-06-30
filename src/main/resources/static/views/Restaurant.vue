@@ -6,7 +6,7 @@
         <div id="rest-main">
             <div id="rest-container">
                 <div id="rest-cover">
-                    <img src="../assets/logo.png" alt="cover">
+                    <img src="img/profile_placeholder.png" alt="cover">
                 </div>
                 <div id="rest-info">
                     <div id="rest-header">
@@ -32,6 +32,41 @@
                             <div id="map" class="map"></div>
                         </div>
                     </div>
+
+                    <div id="articles-and-comments">
+                        <div id="articles">
+                            <h2>What we offer</h2>
+                            <div id="articles-container">
+                                <div class="articles">
+                                    <div v-for="article in articles" :key="article.name" class="article">
+                                        <div class="article-info">
+                                            <h3>{{article.name}}</h3>
+                                            <p>{{article.description}}</p>
+                                            <b>{{article.price}} &#8364;</b>
+                                        </div>
+                                        <div class="spacer"></div>
+                                        <img src="img/profile_placeholder.png" alt="article pic">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="comments">
+                            <h2>Custommer's comments</h2>
+                            <div id="comments-container">
+                                <div class="comments">
+                                    <div v-for="comment in comments" :key="comment.username" class="comment">
+                                        <div class="comment-info">
+                                            <h3>{{comment.username}}</h3>
+                                            <b>{{comment.score}}/5.0</b>
+                                            <p>{{comment.body}}</p>
+                                        </div>
+                                        <div class="spacer"></div>
+                                        <img src="img/profile_placeholder.png" alt="commenter pic">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,6 +77,48 @@
 
 module.exports = {
     data: () => ({
+
+        comments: [
+            {
+                username: 'Petar Petrovic',
+                score: 4.5,
+                body: 'Okej restoran, sta znam. Dobra pica 2',
+            },
+            {
+                username: 'Mirko Mirkovic',
+                score: 5.0,
+                body: 'Kul',
+            },
+            {
+                username: 'Petar Mirkovic',
+                score: 1.5,
+                body: 'Fuj!! Hrana grozna1!1 Ne preporucujem uopste, 1.5 samo zbog radnice xexe',
+            },
+        ],
+
+        articles: [
+            {
+                name: 'Pizza 1',
+                description: 'Pizza 1 description. Has some tunas and stuff',
+                price: 30.4,
+            },
+            {
+                name: 'Pizza 2',
+                description: 'Pizza 2 description. Has some tunas and stuff',
+                price: 43.4,
+            },
+            {
+                name: 'Pizza 3',
+                description: 'Pizza 3 description. Has some tunas and stuff',
+                price: 23.0,
+            },
+            {
+                name: 'Pizza 4',
+                description: 'Pizza 4 description. Has some tunas and stuff',
+                price: 24.0,
+            },
+        ],
+
         map: null,
         restaurant: {
             name: "Liman",
@@ -67,11 +144,27 @@ module.exports = {
                 })
             ],
             view: new ol.View({
-                center: ol.proj.fromLonLat([0.0, 0.0]),
-                zoom: 4
+                center: ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]),
+                zoom: 15
             })
         });
-        console.log(this.map);
+        let restPointer = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]))
+        });
+        restPointer.setStyle(
+            new ol.style.Style({
+                image: new ol.style.Icon({
+                    crossOrigin: 'anonymous',
+                    src: 'img/map-marker-icon.png',
+                    scale: 0.02,
+                }),
+            })
+        );
+        var layer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            features: [ restPointer,
+            ]})});
+        this.map.addLayer(layer);
     },
 };
 </script>
@@ -96,8 +189,12 @@ module.exports = {
     }
 
     #rest-info {
-        margin-top: -20px;
+        position: relative;
         padding: 20px;
+        width: 90%;
+        margin: 0 auto;
+        margin-top: -20px;
+        z-index: 2;
         background: #fff;
     }
 
@@ -107,10 +204,13 @@ module.exports = {
     }
 
     #location h2 {
+        color: #666;
         border-bottom: solid 1px #eee;
     }
 
     #location-container {
+        display: grid;
+        grid-template-columns: 1fr auto;
         padding: 20px;
     }
 
@@ -142,6 +242,69 @@ module.exports = {
 
     .closed {
         color: #e74c3c;
+    }
+
+    #articles-and-comments {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    #articles h2 {
+        color: #666;
+        border-bottom: solid 1px #eee;
+    }
+
+    .articles {
+        height: 400px;
+        /* width: 400px; */
+        overflow: auto;
+    }
+
+    .article {
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+        /* width: 400px; */
+        border-bottom: solid 1px #eee;
+    }
+
+    .article img {
+        width: 128px;
+        height: 128px;
+    }
+
+    .article-info h3 {
+        font-size: 2.5rem;
+    }
+
+    #comments h2 {
+        color: #666;
+        border-bottom: solid 1px #eee;
+    }
+
+    .comments {
+        height: 400px;
+        overflow: auto;
+    }
+
+    .comment {
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+        /* width: 400px; */
+        border-bottom: solid 1px #eee;
+    }
+
+    .comment img {
+        width: 128px;
+        height: 128px;
+    }
+
+    .comment-info h3 {
+        font-size: 2.5rem;
     }
 
 </style>
