@@ -16,7 +16,10 @@
                             <p>{{restaurant.type}}</p>
                         </div>
                         <div class="spacer"></div>
-                        <b id="rest-score">{{restaurant.avgScore}}/5.0</b>
+                        <div id="score-and-buy">
+                            <b id="rest-score">{{restaurant.avgScore}}/5.0</b>
+                            <button class="button-primary">Order</button>
+                        </div>
                     </div>
                     <div id="location">
                         <h2>Where you can find us</h2>
@@ -229,6 +232,12 @@ module.exports = {
 
     #rest-header b {
         text-transform: uppercase;
+    }
+
+    #score-and-buy {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     #rest-score {
