@@ -3,17 +3,18 @@ package beelivery.user.service;
 import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.EType;
 import beelivery.user.model.Regular;
-import beelivery.user.repository.RegularRepository;
+import beelivery.user.model.User;
+import beelivery.user.repository.UserRepository;
 
 public class RegularService {
-    private RegularRepository repository;
+    private UserRepository repository;
 
-    public RegularService(RegularRepository repository) {
+    public RegularService(UserRepository repository) {
         this.repository = repository;
     }
 
     public boolean registerUser(RegisterRequest req) {
-        Regular reg = repository.get(req.getUsername());
+        User reg = repository.get(req.getUsername());
         if (reg != null) {
             return false;
         }

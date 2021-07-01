@@ -1,12 +1,11 @@
 package beelivery.user.model;
 
-import beelivery.misc.IDeleteable;
+import beelivery.misc.IIdentifiable;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
-public abstract class User implements IDeleteable, Serializable {
+public abstract class User implements IIdentifiable<String>, Serializable {
     protected String username;
     protected String password;
     protected String firstName;
@@ -25,11 +24,13 @@ public abstract class User implements IDeleteable, Serializable {
         this.deleted = false;
     }
 
-    public String getUsername() {
+    @Override
+    public String getId() {
         return username;
     }
 
-    public void setUsername(String username) {
+    @Override
+    public void setId(String username) {
         this.username = username;
     }
 
