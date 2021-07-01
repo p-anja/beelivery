@@ -67,6 +67,14 @@
                                         <img src="img/profile_placeholder.png" alt="commenter pic">
                                     </div>
                                 </div>
+                                <div id="review-container">
+                                    <h3>Share your thoughts</h3>
+                                    <label>Rating: </label>
+                                    <b>{{review.rating}} / 5</b>
+                                    <input type="range" min="1" max="5" v-model="review.rating"/>
+                                    <textarea view="review.body" cols="30" rows="10"></textarea>
+                                    <button>Add review</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -80,7 +88,11 @@
 
 module.exports = {
     data: () => ({
-
+        allowedToComment: true,
+        review: {
+            rating: 1,
+            body: '',
+        },
         comments: [
             {
                 username: 'Petar Petrovic',
@@ -314,6 +326,17 @@ module.exports = {
 
     .comment-info h3 {
         font-size: 2.5rem;
+    }
+
+    #review-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #review-container h3 {
+        margin-top: 20px;
+        font-size: 2.5rem;
+        color: #666;
     }
 
 </style>
