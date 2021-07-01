@@ -10,6 +10,7 @@
                     <div id="rest-header">
                         <h2>{{restaurant.name}}</h2>
                         <b :class="restaurant.status == 'Open' ? 'open' : 'closed'">{{restaurant.status}}</b>
+                        <router-link :to="'/restaurant/' + restaurant.name">Go to restaurant page &#62;</router-link>
                     </div>
                 </div>
                 <div id="rest-info">
@@ -86,14 +87,19 @@ module.exports = {
         width: 40vw;
         margin: 0 auto;
     }
-
+    
     #rest-header {
         display: flex;
         flex-direction: column;
     }
 
-    #rest-header {
+    #rest-header b {
         text-transform: uppercase;
+    }
+
+    #rest-header a {
+        color: #333;
+        text-decoration: none;
     }
 
     .open {
