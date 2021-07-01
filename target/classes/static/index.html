@@ -72,7 +72,13 @@
             {
                 path: '/restaurant/:name',
                 name: 'Restaurant',
-                component: httpVueLoader('../views/Restaurant.vue'),
+                component: httpVueLoader('views/Restaurant.vue'),
+            },
+
+            {
+                path: '/cart',
+                name: 'Cart',
+                component: httpVueLoader('views/Cart.vue'),
             },
 
             {
