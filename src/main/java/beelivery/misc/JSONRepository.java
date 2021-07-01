@@ -69,16 +69,15 @@ public class JSONRepository <T extends IIdentifiable<I>, I> {
         return true;
     }
 
-    public T get(I id) {
-        return getAll().stream().filter(e -> e.getId().equals(id)).findFirst().orElse(null);
+    public Optional<T> get(I id) {
+        return getAll().stream().filter(e -> e.getId().equals(id)).findFirst();
     }
 
     public List<T> getAll() {
         List<T> entities = null;
-        Type collectionType = new TypeToken<List<T>>(){}.getType();
         try (FileReader freader = new FileReader(filename);
              JsonReader jreader = new JsonReader(freader)) {
-            entities = gson.fromJson(jreader, collectionType);
+            entities = gson.fromJson(jreader, type);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,7 +86,7 @@ public class JSONRepository <T extends IIdentifiable<I>, I> {
 
     private void save(List<T> entities) {
         try(FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(entities, writer);
+            gson.toJson(entities, type, writer);
         } catch (Exception e) {
             e.printStackTrace();
         }

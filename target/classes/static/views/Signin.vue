@@ -50,7 +50,7 @@ module.exports = {
                 username: this.username,
                 password: this.password,
             };
-            axios.post('signin', data)
+            axios.post('/user/login', data)
                 .then(r => {
                     localStorage.jws = r.data;
                     this.$router.push('/');
