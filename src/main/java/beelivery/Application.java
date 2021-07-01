@@ -3,11 +3,11 @@ package beelivery;
 import static spark.Spark.*;
 
 import beelivery.misc.RuntimeTypeAdapterFactory;
-import beelivery.user.controller.RegularController;
+import beelivery.user.controller.UserController;
 import beelivery.user.model.Regular;
 import beelivery.user.model.User;
 import beelivery.user.repository.UserRepository;
-import beelivery.user.service.RegularService;
+import beelivery.user.service.UserService;
 import com.google.gson.GsonBuilder;
 import spark.Request;
 import spark.Response;
@@ -34,8 +34,8 @@ public class Application {
         get("/", serveStaticResource);
 
         UserRepository userRepository = new UserRepository("regulars.json");
-        RegularService regularService = new RegularService(userRepository);
-        RegularController regularController = new RegularController(regularService);
+        UserService userService = new UserService(userRepository);
+        UserController userController = new UserController(userService);
 
     }
 }

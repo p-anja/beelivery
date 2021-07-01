@@ -6,10 +6,10 @@ import beelivery.user.model.Regular;
 import beelivery.user.model.User;
 import beelivery.user.repository.UserRepository;
 
-public class RegularService {
+public class UserService {
     private UserRepository repository;
 
-    public RegularService(UserRepository repository) {
+    public UserService(UserRepository repository) {
         this.repository = repository;
     }
 

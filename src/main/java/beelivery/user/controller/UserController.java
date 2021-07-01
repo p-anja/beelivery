@@ -1,16 +1,16 @@
 package beelivery.user.controller;
 
 import beelivery.user.dto.RegisterRequest;
-import beelivery.user.service.RegularService;
+import beelivery.user.service.UserService;
 
 import static beelivery.Application.gson;
 import static beelivery.misc.Responses.*;
 import static spark.Spark.post;
 
-public class RegularController {
-    private RegularService service;
+public class UserController {
+    private UserService service;
 
-    public RegularController(RegularService service) {
+    public UserController(UserService service) {
         this.service = service;
 
         post("/user/register", (req, res) -> {
