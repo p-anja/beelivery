@@ -18,7 +18,7 @@
                         <div class="spacer"></div>
                         <div id="score-and-buy">
                             <b id="rest-score">{{restaurant.avgScore}}/5.0</b>
-                            <button class="button-primary">Order</button>
+                            <router-link :to="'/order/' + restaurant.name" class="button button-primary">Order</router-link>
                         </div>
                     </div>
                     <div id="location">
