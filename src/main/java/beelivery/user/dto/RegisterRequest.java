@@ -1,28 +1,24 @@
-package beelivery.user.model;
+package beelivery.user.dto;
 
-import beelivery.misc.IDeleteable;
+import beelivery.user.model.ESex;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
-public abstract class User implements IDeleteable, Serializable {
-    protected String username;
-    protected String password;
-    protected String firstName;
-    protected String lastName;
-    protected ESex sex;
-    protected Date birthDate;
-    protected boolean deleted;
+public class RegisterRequest {
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private ESex sex;
+    private Date birthDate;
 
-    public User(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
+    public RegisterRequest(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.sex = sex;
         this.birthDate = birthDate;
-        this.deleted = false;
     }
 
     public String getUsername() {
@@ -71,13 +67,5 @@ public abstract class User implements IDeleteable, Serializable {
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
-    }
-
-    public boolean isDeleted() {
-        return this.deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }
