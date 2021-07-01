@@ -1,14 +1,17 @@
 package beelivery.user.model;
 
+import beelivery.misc.IDeleteable;
+
 import java.time.LocalDateTime;
 
-public abstract class User {
+public abstract class User implements IDeleteable {
     protected String username;
     protected String password;
     protected String firstName;
     protected String lastName;
     protected ESex sex;
     protected LocalDateTime birthDate;
+    protected boolean deleted;
 
     public User(String username, String password, String firstName, String lastName, ESex sex, LocalDateTime birthDate) {
         this.username = username;
@@ -17,6 +20,7 @@ public abstract class User {
         this.lastName = lastName;
         this.sex = sex;
         this.birthDate = birthDate;
+        this.deleted = false;
     }
 
     public String getUsername() {
@@ -65,5 +69,13 @@ public abstract class User {
 
     public void setBirthDate(LocalDateTime birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public boolean isDeleted() {
+        return this.deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
