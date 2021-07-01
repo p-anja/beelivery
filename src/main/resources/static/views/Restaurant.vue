@@ -58,13 +58,21 @@
                             <div id="comments-container">
                                 <div class="comments">
                                     <div v-for="comment in comments" :key="comment.username" class="comment">
-                                        <div class="comment-info">
-                                            <h3>{{comment.username}}</h3>
-                                            <b>{{comment.score}}/5.0</b>
-                                            <p>{{comment.body}}</p>
+                                        <div class="comment-container">
+                                            <div class="comment-info">
+                                                <h3>{{comment.username}}</h3>
+                                                <b>{{comment.score}}/5.0</b>
+                                                <b v-if="isManager" :class="comment.status.toLowerCase()">{{comment.status}}</b>
+                                                <p>{{comment.body}}</p>
+                                            </div>
+                                            <div class="spacer"></div>
+                                            <img src="img/profile_placeholder.png" alt="commenter pic">
                                         </div>
-                                        <div class="spacer"></div>
-                                        <img src="img/profile_placeholder.png" alt="commenter pic">
+                                        <div v-if="(isManager || isAdmin) && comment.status == 'Pending'" class="comment-actions">
+                                            <button class="button-approve">Approve</button>
+                                            <div class="spacer"></div>
+                                            <button class="button-deny">Deny</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="review-container">
@@ -89,6 +97,8 @@
 module.exports = {
     data: () => ({
         allowedToComment: true,
+        isManager: true,
+        isAdmin: false,
         review: {
             rating: 1,
             body: '',
@@ -98,16 +108,19 @@ module.exports = {
                 username: 'Petar Petrovic',
                 score: 4.5,
                 body: 'Okej restoran, sta znam. Dobra pica 2',
+                status: 'Pending',
             },
             {
                 username: 'Mirko Mirkovic',
                 score: 5.0,
                 body: 'Kul',
+                status: 'Approved',
             },
             {
                 username: 'Petar Mirkovic',
                 score: 1.5,
                 body: 'Fuj!! Hrana grozna1!1 Ne preporucujem uopste, 1.5 samo zbog radnice xexe',
+                status: 'Denied',
             },
         ],
 
@@ -311,21 +324,60 @@ module.exports = {
         overflow: auto;
     }
 
-    .comment {
+    .comment-container {
         display: flex;
         flex-direction: row;
-        padding: 5px;
         /* width: 400px; */
-        border-bottom: solid 1px #eee;
     }
 
-    .comment img {
+    .comment {
+        border-bottom: solid 1px #eee;
+        padding: 5px;
+    }
+
+    .comment-container img {
         width: 128px;
         height: 128px;
     }
 
+    .comment-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .comment-info b {
+        text-transform: uppercase;
+    }
+
     .comment-info h3 {
         font-size: 2.5rem;
+    }
+
+    .comment-actions {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .approved {
+        color: #2ecc71;
+    }
+
+    .button-approve {
+        color: #fff;
+        background-color: #2ecc71;
+    }
+
+    .button-deny {
+        color: #fff;
+        background-color: #e74c3c;
+    }
+
+    .pending {
+        color: #666;
+    }
+
+    .denied {
+        color: #e74c3c;
     }
 
     #review-container {
