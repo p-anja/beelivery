@@ -4,7 +4,7 @@
 			<div id="nav" :class="{sticky:active}">
 				<div class="nav-container" :class="toggleNavClass()">
 					<div class="navbar-item logo">
-						beelivery
+						<router-link id="logo" to="/">beelivery</router-link>
 					</div>
 					<div id="search">
 						<!-- Search text field -->
@@ -13,6 +13,7 @@
 					<div id="nav-links">
 						<slot></slot>
 						<div id="user-controls" v-if="jws">
+							<router-link to="/userinfo">Profile</router-link>
 							<router-link id="cart" to="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
 							<a href="#" @click="logout">Logout</a>
 						</div>
@@ -65,6 +66,15 @@
 	}
 </script>
 <style scoped>
+	#logo {
+		text-decoration: none;
+		color: #311403;
+	}
+
+	#logo:hover {
+		color: var(--accent);
+	}
+
 	#navapp {
 		--h: 8vh;
 		background-color: #fff;

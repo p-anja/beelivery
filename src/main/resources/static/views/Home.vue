@@ -42,21 +42,13 @@
 module.exports = {
     data() {
         return {
-            name: 'Hello',
-            response: '',
         }
     },
 
     methods: {
-        getHello: function() {
-            axios.get('hello')
-                .then(r => this.response = r.data)
-                .catch(r => console.log(r));
-        },
     },
 
     mounted() {
-        this.getHello();
     }
 };
 </script>

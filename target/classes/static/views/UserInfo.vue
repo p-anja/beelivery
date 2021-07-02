@@ -138,8 +138,8 @@ module.exports = {
                 password: this.newPassword,
                 firstName: this.user.firstName,
                 lastName: this.user.lastName,
-                birthDate: this.birthDate,
-                sex: this.sex,
+                birthDate: this.user.birthDate,
+                sex: this.user.sex,
             };
 
             axios.post('/user/update', data, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
@@ -157,8 +157,8 @@ module.exports = {
     #userinfo-main {
         display: grid;
         place-items: center;
-        height: 87vh;
-        background: #fafafa;
+        height: 92vh;
+        background: var(--secondary);
     }
 
     #userinfo-container {
@@ -191,10 +191,12 @@ module.exports = {
         display: flex;
         flex-direction: column;
         height: 100%;
+        padding: 10px;
     }
 
     #userinfo-form-container {
         display: grid;
+        gap: 10px;
         grid-template-columns: 1fr 1fr;
     }
 
