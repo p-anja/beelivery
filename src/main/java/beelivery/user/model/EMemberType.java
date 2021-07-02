@@ -1,5 +1,5 @@
 package beelivery.user.model;
 
-public enum EType {
+public enum EMemberType {
     BRONZE, SILVER, GOLD
 }

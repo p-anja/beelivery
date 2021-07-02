@@ -7,9 +7,9 @@ public class Regular extends User {
     // orders
     // cart
     private double points;
-    private EType memberType;
+    private EMemberType memberType;
 
-    public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate, double points, EType memberType) {
+    public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate, double points, EMemberType memberType) {
         super(username, password, firstName, lastName, sex, ERole.REGULAR, birthDate);
         this.points = points;
         this.memberType = memberType;
@@ -18,7 +18,7 @@ public class Regular extends User {
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
         super(username, password, firstName, lastName, sex, ERole.REGULAR, birthDate);
         this.points = 0.0;
-        this.memberType = EType.BRONZE;
+        this.memberType = EMemberType.BRONZE;
     }
 
     public double getPoints() {
@@ -29,11 +29,11 @@ public class Regular extends User {
         this.points = points;
     }
 
-    public EType getMemberType() {
+    public EMemberType getMemberType() {
         return memberType;
     }
 
-    public void setMemberType(EType memberType) {
+    public void setMemberType(EMemberType memberType) {
         this.memberType = memberType;
     }
 }

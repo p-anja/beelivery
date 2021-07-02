@@ -1,31 +1,94 @@
 package beelivery.user.controller;
 
 import beelivery.misc.JwtUtil;
+import beelivery.restaurant.service.RestaurantService;
+import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.ERole;
 import beelivery.user.model.User;
 import beelivery.user.service.UserService;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.Part;
+import javax.swing.text.html.Option;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Optional;
 
 import static beelivery.Application.gson;
-import static beelivery.misc.Responses.badRequest;
-import static beelivery.misc.Responses.forbidden;
+import static beelivery.misc.Responses.*;
 import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class AdminController {
     private UserService service;
+    private RestaurantService restaurantService;
 
-    public AdminController(UserService service) {
+    public AdminController(UserService service, RestaurantService restaurantService) {
         this.service = service;
+        this.restaurantService = restaurantService;
+
+        post("/admin/restaurant", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String location = "image";
+                long maxFileSize = 100000000;
+                long maxRequestSize = 100000000;
+                int fileSizeThreshold = 1024;
+                MultipartConfigElement mce = new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold);
+                req.raw().setAttribute("org.eclipse.jetty.multipartConfig", mce);
+                Collection<Part> parts = req.raw().getParts();
+                String fname = req.raw().getPart("file").getSubmittedFileName();
+                System.out.println(fname);
+                System.out.println(req.raw().getPart("lat"));
+                Path out = Paths.get(fname);
+                try (final InputStream in = req.raw().getPart("file").getInputStream()) {
+                    Files.copy(in, out);
+                }
+
+                return ok("Ok", res);
+//                restaurantService.create();
+
+            } catch(Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/admin/manager", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                return service.registerManager(gson.fromJson(req.body(), RegisterRequest.class)) ?
+                        ok("Registered manager", res)
+                        : badRequest("Failed to register manager", res);
+            } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/admin/managers", (req, res) -> {
+            try {
+                if(!service.validateJWS(req, ERole.ADMIN).isPresent()) {
+                    return forbidden(res);
+                }
+                return gson.toJson(service.getRestaurantlessManagers());
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
 
         get("/admin/users", (req, res) -> {
-            Optional<String> jws = JwtUtil.parseJws(req);
-            if(!jws.isPresent()) {
-                return badRequest("Missing jws", res);
-            }
-            String username = JwtUtil.getUsername(jws.get());
-            Optional<User> u = service.getByUsername(username);
-            if(!u.isPresent() || u.get().getRole() != ERole.ADMIN) {
+            Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+            if(!u.isPresent()) {
                 return forbidden(res);
             }
             res.type("application/json");

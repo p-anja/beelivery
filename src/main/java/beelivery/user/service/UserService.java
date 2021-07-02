@@ -3,20 +3,16 @@ package beelivery.user.service;
 import beelivery.misc.JwtUtil;
 import beelivery.user.dto.LoginRequest;
 import beelivery.user.dto.RegisterRequest;
-import beelivery.user.model.EType;
-import beelivery.user.model.Regular;
-import beelivery.user.model.User;
+import beelivery.user.model.*;
 import beelivery.user.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import spark.Request;
 
-import java.security.Key;
-import java.sql.Date;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static beelivery.misc.Responses.badRequest;
+import static beelivery.misc.Responses.forbidden;
 
 public class UserService {
     private UserRepository repository;
@@ -54,13 +50,44 @@ public class UserService {
         return false;
     }
 
+    public Optional<User> validateJWS(Request req) {
+        Optional<String> jws = JwtUtil.parseJws(req);
+        if(!jws.isPresent()) {
+            return Optional.empty();
+        }
+        String username = JwtUtil.getUsername(jws.get());
+        Optional<User> u = getByUsername(username);
+        return u;
+    }
+
+    public Optional<User> validateJWS(Request req, ERole role) {
+        Optional<String> jws = JwtUtil.parseJws(req);
+        if(!jws.isPresent()) {
+            return Optional.empty();
+        }
+        String username = JwtUtil.getUsername(jws.get());
+        Optional<User> u = getByUsername(username);
+        if(!u.isPresent() || !u.get().getRole().equals(role)) {
+            return Optional.empty();
+        }
+        return u;
+    }
+
     public boolean registerUser(RegisterRequest req) {
         Optional<User> reg = repository.get(req.getUsername());
         if (reg.isPresent()) {
             return false;
         }
-        Regular newRegular = new Regular(req.getUsername(), req.getPassword(), req.getFirstName(), req.getLastName(), req.getSex(), req.getBirthDate(), 0, EType.BRONZE);
+        Regular newRegular = new Regular(req.getUsername(), req.getPassword(), req.getFirstName(), req.getLastName(), req.getSex(), req.getBirthDate(), 0, EMemberType.BRONZE);
         return repository.create(newRegular);
+    }
+
+    public boolean registerManager(RegisterRequest req) {
+        if(getByUsername(req.getUsername()).isPresent()) {
+            return false;
+        }
+        Manager manager = new Manager(req.getUsername(), req.getPassword(), req.getFirstName(), req.getLastName(), req.getSex(), req.getBirthDate());
+        return repository.create(manager);
     }
 
     public Optional<User> getByUsername(String username) {
@@ -83,6 +110,17 @@ public class UserService {
         }
 
         return res;
+    }
+
+    public List<Manager> getRestaurantlessManagers() {
+        return getManagers().stream().filter(m -> m.getRestaurant() == null)
+                .collect(Collectors.toList());
+    }
+
+    public List<Manager> getManagers() {
+        return getAll().stream().filter(u -> u.getRole().equals(ERole.MANAGER)  && u instanceof Manager)
+            .map(u -> (Manager) u)
+            .collect(Collectors.toList());
     }
 
     public List<User> getAll() {

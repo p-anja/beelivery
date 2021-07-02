@@ -32,7 +32,7 @@
                         <h3>{{user.username}}</h3>
                         <p>{{user.firstName}} {{user.lastName}}</p>
                         <b class="role">{{user.role}}</b>
-                        <b :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
+                        <b v-if="user.memberType" :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
                         <span>Points: {{user.points}}</span>
                     </div>
                 </div>
