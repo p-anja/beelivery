@@ -8,7 +8,7 @@
 					</div>
 					<div id="search">
 						<!-- Search text field -->
-						<input placeholder="Search restaurants" type="text">
+						<input placeholder="Search restaurants" type="text" v-model="search" @keyup.enter="$router.push('/restsearch/' + search)">
 					</div>
 					<div id="nav-links">
 						<slot></slot>

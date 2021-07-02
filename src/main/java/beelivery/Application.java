@@ -4,6 +4,7 @@ import static spark.Spark.*;
 
 import beelivery.misc.ImageController;
 import beelivery.misc.RuntimeTypeAdapterFactory;
+import beelivery.restaurant.RestaurantController;
 import beelivery.restaurant.repository.RestaurantRepository;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.controller.AdminController;
@@ -48,12 +49,13 @@ public class Application {
 
         ImageController imageController = new ImageController(UPLOAD_DIR);
 
-        UserRepository userRepository = new UserRepository("regulars.json");
+        UserRepository userRepository = new UserRepository("users.json");
         UserService userService = new UserService(userRepository);
         UserController userController = new UserController(userService);
 
         RestaurantRepository restaurantRepository = new RestaurantRepository("restaurants.json");
         RestaurantService restaurantService = new RestaurantService(restaurantRepository);
+        RestaurantController restaurantController = new RestaurantController(restaurantService);
         AdminController adminController = new AdminController(userService, restaurantService);
 
     }

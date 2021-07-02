@@ -1,48 +1,51 @@
 <template>
-    <div id="search-main">
-        <div id="search-container">
-            <input type="text" placeholder="Name">
-            <div id="sort-container">
-                <p @click="sort('name')">Name <span v-if="sortBy == 'name'" v-html="sortSymbol"></span></p>
-                <p @click="sort('address.city')">City <span v-if="sortBy == 'address.city'" v-html="sortSymbol"></span></p>
-                <p @click="sort('address.state')">State <span v-if="sortBy == 'address.state'" v-html="sortSymbol"></span></p>
-                <p @click="sort('avgScore')">Avg. score <span v-if="sortBy == 'avgScore'" v-html="sortSymbol"></span></p>
-            </div>
-            <div id="filters-container">
-                <div v-for="(filter, index) in selectedFilters" :key="filter.text" class="filter-tag">
-                    <input v-if="filter.edit && filter.editable"
-                    :placeholder="filter.text"
-                    :type="filter.type ? filter.type : 'text'"
-                    v-model="filter.value"
-                    @blur="filter.edit=false; $emit('update')"
-                    @keyup.enter="filter.edit=false; $emit('update')"/>
-                    <div v-else class="filter-tag-inner" @click="filter.edit=true">
-                        <div>{{filter.text}} {{filter.value}}</div>
-                        <div class="spacer"></div>
-                        <span @click="removeFilter(index)">x</span>
-                    </div>
+    <div>
+        <main-navigation></main-navigation>
+        <div id="search-main">
+            <div id="search-container">
+                <input type="text" placeholder="Name" @keyup.enter="search" v-model="name">
+                <div id="sort-container">
+                    <p @click="sort('name')">Name <span v-if="sortBy == 'name'" v-html="sortSymbol"></span></p>
+                    <p @click="sort('address.city')">City <span v-if="sortBy == 'address.city'" v-html="sortSymbol"></span></p>
+                    <p @click="sort('address.state')">State <span v-if="sortBy == 'address.state'" v-html="sortSymbol"></span></p>
+                    <p @click="sort('avgScore')">Avg. score <span v-if="sortBy == 'avgScore'" v-html="sortSymbol"></span></p>
                 </div>
-                <select v-model="selectedFilter" @change="selectFilter">
-                    <option value="" disabled>Add a filter</option>
-                    <option v-for="filter in filters" :key="filter.text" :value="filter">{{filter.text}}</option>
-                </select>
-            </div>
-        </div>
-        <div id="results-container">
-            <div v-for="result in sortedResults" :key="result.name" class="result">
-                <div class="result-header">
-                    <h3>{{result.name}}</h3>
-                    <b :class="result.status=='Open' ? 'open' : 'closed'">{{result.status}}</b>
-                    <p>{{result.type}}</p>
-                    <p>{{result.avgScore}}/5.0</p>
-                    <div class="result-location">
-                        <p>{{result.address.street}} {{result.address.streetNo}}</p>
-                        <p>{{result.address.city}}, {{result.address.state}}</p>
+                <div id="filters-container">
+                    <div v-for="(filter, index) in selectedFilters" :key="filter.text" class="filter-tag">
+                        <input v-if="filter.edit && filter.editable"
+                        :placeholder="filter.text"
+                        :type="filter.type ? filter.type : 'text'"
+                        v-model="filter.value"
+                        @blur="filter.edit=false; $emit('update')"
+                        @keyup.enter="filter.edit=false; $emit('update')"/>
+                        <div v-else class="filter-tag-inner" @click="filter.edit=true">
+                            <div>{{filter.text}} {{filter.value}}</div>
+                            <div class="spacer"></div>
+                            <span @click="removeFilter(index)">x</span>
+                        </div>
                     </div>
+                    <select v-model="selectedFilter" @change="selectFilter">
+                        <option value="" disabled>Add a filter</option>
+                        <option v-for="filter in filters" :key="filter.text" :value="filter">{{filter.text}}</option>
+                    </select>
                 </div>
-                <div class="spacer"></div>
-                <div class="result-profile">
-                    <img src="img/profile_placeholder.png" alt="Logo">
+            </div>
+            <div id="results-container">
+                <div @click="$router.push('/restaurant/' + result.name)" v-for="result in sortedResults" :key="result.name" class="result">
+                    <div class="result-header">
+                        <h3>{{result.name}}</h3>
+                        <b :class="result.status=='OPEN' ? 'open' : 'closed'">{{result.status}}</b>
+                        <p>{{result.restType}}</p>
+                        <p>{{result.avgScore}}/5.0</p>
+                        <div class="result-location">
+                            <p>{{result.address.street}} {{result.address.streetNo}}</p>
+                            <p>{{result.address.city}}, {{result.address.state}}</p>
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="result-profile">
+                        <img :src="'http://localhost:8080/image/' + result.logoFilepath" alt="Logo">
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,6 +55,7 @@
 <script>
 module.exports = {
     data: () => ({
+        name: '',
         sortBy: 'name',
         sortDirection: 'asc',
         results: [
@@ -110,12 +114,38 @@ module.exports = {
             { text: "Type", value: '', edit: false, editable: true, },
             { text: "City", value: '', edit: false, editable: true, },
             { text: "State", value: '', edit: false, editable: true, },
-            { text: "Avg. score", value: '', edit: false, editable: true, type: 'number' },
+            { text: "Avg. score", value: 0.0, edit: false, editable: true, type: 'number' },
             { text: "Only open", value: '', edit: false, },
         ],
         selectedFilters: [],
     }),
     methods: {
+        search: function() {
+            this.results = [];
+            let type = '';
+            let city = '';
+            let state ='';
+            let avgScore = 0.0;
+            this.selectedFilters.forEach(f => {
+                if(f.text == 'Type') {
+                    type = f.value;
+                }
+                if(f.text == 'City') {
+                    city = f.value;
+                }
+                if(f.text == 'State') {
+                    state = f.value;
+                }
+                if(f.text == 'Avg. score') {
+                    avgScore = f.value;
+                }
+            });
+            let query = '?name=' + this.name + '&type=' + type + '&state=' + state + '&city=' + city + '&score=' + avgScore;
+            axios.get('/restaurant' + query)
+                .then(r => this.results = r.data)
+                .catch(r => console.log(r));
+        },
+
         sort: function(s) {
             if(this.sortBy == s) {
                 this.sortDirection = this.sortDirection == 'asc' ? 'desc' : 'asc';
@@ -167,6 +197,9 @@ module.exports = {
         sortSymbol: function() {
             return this.sortDirection=='asc' ? '&#x25B2;' : '&#x25BC;'
         },
+    },
+    mounted() {
+        this.search();
     },
 };
 </script>
@@ -234,6 +267,7 @@ module.exports = {
     }
 
     .result {
+        cursor: pointer;
         display: flex;
         flex-direction: row;
         background: #fff;
