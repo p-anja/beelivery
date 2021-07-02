@@ -1,6 +1,9 @@
 package beelivery.user.controller;
 
+import beelivery.Application;
 import beelivery.misc.JwtUtil;
+import beelivery.restaurant.dto.RestaurantRequest;
+import beelivery.restaurant.model.Restaurant;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.ERole;
@@ -10,6 +13,7 @@ import beelivery.user.service.UserService;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import javax.swing.text.html.Option;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,15 +49,18 @@ public class AdminController {
                 req.raw().setAttribute("org.eclipse.jetty.multipartConfig", mce);
                 Collection<Part> parts = req.raw().getParts();
                 String fname = req.raw().getPart("file").getSubmittedFileName();
-                System.out.println(fname);
-                System.out.println(req.raw().getPart("lat"));
-                Path out = Paths.get(fname);
+                Path out = Paths.get(Application.UPLOAD_DIR + File.separator + fname);
                 try (final InputStream in = req.raw().getPart("file").getInputStream()) {
                     Files.copy(in, out);
                 }
-
-                return ok("Ok", res);
-//                restaurantService.create();
+                RestaurantRequest restReq = gson.fromJson(req.raw().getParameter("request"), RestaurantRequest.class);
+                Optional<Restaurant> r = restaurantService.create(restReq, fname);
+                if(!r.isPresent()) {
+                    return badRequest("Bad request", res);
+                }
+                return service.addRestaurantToManager(restReq.getManagerUsername(), r.get())
+                        ? ok("Added", res)
+                        : badRequest("Failed to add", res);
 
             } catch(Exception e) {
                 e.printStackTrace();

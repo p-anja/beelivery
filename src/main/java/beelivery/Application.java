@@ -2,6 +2,7 @@ package beelivery;
 
 import static spark.Spark.*;
 
+import beelivery.misc.ImageController;
 import beelivery.misc.RuntimeTypeAdapterFactory;
 import beelivery.restaurant.repository.RestaurantRepository;
 import beelivery.restaurant.service.RestaurantService;
@@ -19,15 +20,20 @@ import spark.Response;
 import spark.Route;
 import com.google.gson.Gson;
 
+import java.io.File;
+
 public class Application {
 
     public static Gson gson;
+    public static String UPLOAD_DIR = "uploads";
 
     public static Route serveStaticResource = (Request req, Response res) -> {
         res.redirect("/");
         return res;
     };
     public static void main(String[] args) {
+        new File(UPLOAD_DIR).mkdir();
+
         RuntimeTypeAdapterFactory<User> userAdapterFactory = RuntimeTypeAdapterFactory.of(User.class)
                 .registerSubtype(Regular.class)
                 .registerSubtype(Admin.class)
@@ -39,6 +45,8 @@ public class Application {
         port(8080);
         staticFiles.location("/static");
         get("/", serveStaticResource);
+
+        ImageController imageController = new ImageController(UPLOAD_DIR);
 
         UserRepository userRepository = new UserRepository("regulars.json");
         UserService userService = new UserService(userRepository);

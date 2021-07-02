@@ -1,6 +1,7 @@
 package beelivery.user.service;
 
 import beelivery.misc.JwtUtil;
+import beelivery.restaurant.model.Restaurant;
 import beelivery.user.dto.LoginRequest;
 import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.*;
@@ -71,6 +72,16 @@ public class UserService {
             return Optional.empty();
         }
         return u;
+    }
+
+    public boolean addRestaurantToManager(String username, Restaurant r) {
+        Optional<User> u = getByUsername(username);
+        if(!u.isPresent() || !u.get().getRole().equals(ERole.MANAGER)) {
+            return false;
+        }
+        Manager m = (Manager) u.get();
+        m.setRestaurant(r);
+        return repository.update(m);
     }
 
     public boolean registerUser(RegisterRequest req) {

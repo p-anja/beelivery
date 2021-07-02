@@ -205,15 +205,20 @@ module.exports = {
             }
 
             let data = new FormData();
-            data.append('name', this.restaurantName);
-            data.append('type', this.selectedType);
-            data.append('manager', this.selectedManager);
-            data.append('lat', this.lat);
-            data.append('lon', this.lon);
-            data.append('state', this.state);
-            data.append('city', this.city);
-            data.append('street', this.street);
-            data.append('streetNo', this.streetNo);
+            let request = {
+                name: this.restaurantName,
+                type: this.selectedType,
+                managerUsername: this.selectedManager,
+                address: {
+                    state: this.state,
+                    city: this.city,
+                    street: this.street,
+                    streetNo: this.streetNo,
+                    lat: this.lat,
+                    lon: this.lon,
+                }
+            };
+            data.append('request', JSON.stringify(request));
             data.append('file', this.file);
             let config = {
                 headers: {

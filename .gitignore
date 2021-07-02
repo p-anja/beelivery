@@ -75,3 +75,5 @@ fabric.properties
 
 # Json ignoree
 *.json
+
+uploads/*
