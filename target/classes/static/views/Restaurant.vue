@@ -13,6 +13,7 @@
                             <h1>{{restaurant.name}}</h1>
                             <b :class="restaurant.status == 'OPEN' ? 'open' : 'closed'">{{restaurant.status}}</b>
                             <p>{{restaurant.type}}</p>
+                            {{isManager}}
                         </div>
                         <div class="spacer"></div>
                         <div id="score-and-buy">
@@ -47,8 +48,38 @@
                                             <b>{{article.price}} &#8364;</b>
                                         </div>
                                         <div class="spacer"></div>
-                                        <img src="img/profile_placeholder.png" alt="article pic">
+                                        <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
                                     </div>
+                                </div>
+                                <div v-if="isManager" id="new-article-container">
+                                    <div id="new-article-and-profile">
+                                        <div id="new-article">
+                                            <b class="error">{{errors.articleName}}</b>
+                                            <input type="text" placeholder="Article name" v-model="articleName">
+                                            <div id="price-and-type">
+                                                <input type="number" min="1" v-model="articlePrice"
+                                                @blur="articlPrice = articlePrice < 1 ? 1 : articlePrice">
+                                                <select v-model="articleType">
+                                                    <option value="DRINK">Drink</option>
+                                                    <option value="FOOD">Food</option>
+                                                </select>
+                                            </div>
+                                            <input type="number" :placeholder="articleType == 'DRINK' ? 'amount (ml)' : 'amount (g)'"
+                                                v-model="articleAmount"
+                                                min="1"
+                                                 @blur="articleAmount = articleAmount < 1 ? 1 : articleAmount">
+                                        </div>
+                                        <div id="new-article-profile">
+                                            <b class="error">{{errors.articleProfile}}</b>
+                                            <input type="file" style="display: none" ref="file" @change="selectArticleFile">
+                                            <div v-if="!file" @click="$refs.file.click()" id="thumbnail-placholder">
+                                                +
+                                            </div>
+                                            <img :key="imgKey" v-else @click="$refs.file.click()" :src="fileUrl" alt="article profile"/>
+                                        </div>
+                                    </div>
+                                    <textarea placeholder="Description" v-model="articleDescription" cols="30" rows="10"></textarea>
+                                    <button class="button-primary" @click="addArticle">Add article</button>
                                 </div>
                             </div>
                         </div>
@@ -95,6 +126,18 @@
 
 module.exports = {
     data: () => ({
+        imgKey: 1,
+        articleName: '',
+        articlePrice: 1,
+        articleType: 'DRINK',
+        articleAmount: 1,
+        articleDescription: '',
+        errors: {
+            articleName: '',
+            articleProfile: '',
+        },
+        file: '',
+        fileUrl: '',
         allowedToComment: false,
         isManager: false,
         isAdmin: false,
@@ -164,16 +207,29 @@ module.exports = {
     }),
 
     methods: {
+        selectArticleFile: function() {
+            this.file = '';
+            if(this.fileUrl) {
+                URL.revokeObjectURL(this.fileUrl);
+                this.fileUrl = '';
+            }
+            let file = this.$refs.file.files[0];
+            this.fileUrl = URL.createObjectURL(file);
+            this.file = file;
+            ++this.imgKey;
+        },
+
         getRole: function() {
             if(!localStorage.jws) {
                 return;
             }
-            axios.get('/user/role', {headers: {'Authorization': localStorage.jws}})
+            axios.get('/user/role', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
                 .then(r => {
                     if(r.data == 'ADMIN') {
                         this.isAdmin = true;
                     }
                     if(r.data == 'MANAGER') {
+                        console.log('ismanager');
                         this.isManager = true;
                     }
                     if(r.data == 'REGULAR') {
@@ -190,6 +246,7 @@ module.exports = {
     },
 
     mounted() {
+        this.getRole();
         this.getRestaurant()
             .then(r => {
                 this.restaurant = r.data;
@@ -425,5 +482,44 @@ module.exports = {
         font-size: 2.5rem;
         color: #666;
     }
+
+    #new-article-container {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    #new-article-and-profile {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    #new-article {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    #price-and-type {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #new-article-profile img {
+        cursor: pointer;
+        width: 128px;
+        height: 128px;
+    }
+
+    #thumbnail-placholder {
+        width: 128px;
+        height: 128px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        background: #eee;
+        font-size: 10rem;
+    }    
 
 </style>
