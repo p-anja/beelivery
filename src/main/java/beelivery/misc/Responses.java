@@ -16,6 +16,12 @@ public class Responses {
         return res;
     }
 
+    public static Response notFound(Response res) {
+        res.body("Not found");
+        res.status(404);
+        return res;
+    }
+
     public static Response internal(Response res) {
         res.body("Internal server error");
         res.status(500);

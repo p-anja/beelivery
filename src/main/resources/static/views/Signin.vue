@@ -8,7 +8,7 @@
                 <b class="error">{{errors.username}}</b>
                 <input type="text" v-model="username" placeholder="Username">
                 <b class="error">{{errors.password}}</b>
-                <input type="text" v-model="password" placeholder="Password">
+                <input type="password" v-model="password" placeholder="Password">
                 <div class="spacer"></div>
                 <input class="button-primary" type="submit" value="Sign in">
                 <router-link to="/signup">Don't have an account? Signup now!</router-link>

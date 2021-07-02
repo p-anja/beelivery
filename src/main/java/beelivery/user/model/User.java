@@ -11,15 +11,17 @@ public abstract class User implements IIdentifiable<String>, Serializable {
     protected String firstName;
     protected String lastName;
     protected ESex sex;
+    protected ERole role;
     protected Date birthDate;
     protected boolean deleted;
 
-    public User(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
+    public User(String username, String password, String firstName, String lastName, ESex sex, ERole role, Date birthDate) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.sex = sex;
+        this.role = role;
         this.birthDate = birthDate;
         this.deleted = false;
     }
@@ -80,5 +82,21 @@ public abstract class User implements IIdentifiable<String>, Serializable {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public ERole getRole() {
+        return role;
+    }
+
+    public void setRole(ERole role) {
+        this.role = role;
     }
 }

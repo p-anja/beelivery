@@ -12,7 +12,10 @@
 					</div>
 					<div id="nav-links">
 						<slot></slot>
-						<router-link v-if="jws" to="/logout">Logout</router-link>
+						<div id="user-controls" v-if="jws">
+							<router-link id="cart" to="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
+							<a href="#" @click="logout">Logout</a>
+						</div>
 						<router-link v-else to="/signin">Login</router-link>
 					</div>
 				</div>
@@ -33,6 +36,10 @@
 		},
 		methods:
 		{
+			logout: function() {
+				localStorage.removeItem('jws');
+				this.$router.go();
+			},
 
 			toggleNavClass()
 			{
@@ -177,6 +184,15 @@
 	#search {
 		display: grid;
 		place-items: center;
+	}
+
+	#user-controls {
+		display: flex;
+		flex-direction: row;
+	}
+
+	#nav-links #cart {
+		font-size: 2rem;
 	}
 
 </style>

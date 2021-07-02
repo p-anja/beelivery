@@ -1,5 +1,6 @@
 package beelivery.user.service;
 
+import beelivery.misc.JwtUtil;
 import beelivery.user.dto.LoginRequest;
 import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.EType;
@@ -17,7 +18,6 @@ import java.util.Optional;
 
 public class UserService {
     private UserRepository repository;
-    private static final Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public UserService(UserRepository repository) {
         this.repository = repository;
@@ -29,7 +29,27 @@ public class UserService {
             return Optional.empty();
         }
 
-        return Optional.of(generateJws(u.get()));
+        return Optional.of(JwtUtil.generateJws(u.get()));
+    }
+
+    public boolean updateUser(RegisterRequest req) {
+        Optional<User> u = getByUsername(req.getUsername());
+        if (!u.isPresent()) {
+            return false;
+        }
+
+        switch(u.get().getRole()) {
+            case REGULAR: {
+                Regular r = (Regular) u.get();
+                r.setBirthDate(req.getBirthDate());
+                r.setSex(req.getSex());
+                r.setFirstName(req.getFirstName());
+                r.setLastName(req.getLastName());
+                r.setPassword(req.getPassword());
+                return repository.update(r);
+            }
+        }
+        return false;
     }
 
     public boolean registerUser(RegisterRequest req) {
@@ -41,11 +61,8 @@ public class UserService {
         return repository.create(newRegular);
     }
 
-    private String generateJws(User user) {
-        return Jwts.builder()
-                .setSubject(user.getId())
-                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(30).toInstant()))
-                .signWith(KEY)
-                .compact();
+    public Optional<User> getByUsername(String username) {
+        return repository.get(username);
     }
+
 }

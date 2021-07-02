@@ -61,13 +61,6 @@
                 name: 'UserInfo',
                 component: httpVueLoader('views/UserInfo.vue'),
             },
-            {
-                path: '/logout',
-                beforeEnter: (to, from, next) => {
-                    localStorage.jws = '';
-                    next({name: "Home"});
-                },
-            },
 
             {
                 path: '/restaurant/:name',

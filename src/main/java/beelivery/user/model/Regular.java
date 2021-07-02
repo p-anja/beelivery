@@ -10,13 +10,13 @@ public class Regular extends User {
     private EType memberType;
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate, double points, EType memberType) {
-        super(username, password, firstName, lastName, sex, birthDate);
+        super(username, password, firstName, lastName, sex, ERole.REGULAR, birthDate);
         this.points = points;
         this.memberType = memberType;
     }
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
-        super(username, password, firstName, lastName, sex, birthDate);
+        super(username, password, firstName, lastName, sex, ERole.REGULAR, birthDate);
         this.points = 0.0;
         this.memberType = EType.BRONZE;
     }

@@ -29,6 +29,7 @@
                 <b class="error">{{errors.lastName}}</b>
                 <input v-model="lastName" type="text" placeholder="Last name">
                 <select v-model="sex">
+                    <option value="" disabled>Select sex</option>
                     <option value="MALE">Male</option>
                     <option value="FEMALE">Female</option>
                     <option value="OTHER">Other</option>
@@ -54,7 +55,7 @@ module.exports = {
             password: '',
             firstName: '',
             lastName: '',
-            sex: 'male',
+            sex: '',
             birthDate: '',
             errors: {
                 username: '',
