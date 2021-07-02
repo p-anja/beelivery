@@ -71,6 +71,25 @@ public class UserController {
             }
         });
 
+        get("/user/role", (req, res) -> {
+            try {
+                Optional<String> jws = JwtUtil.parseJws(req);
+                if(!jws.isPresent()) {
+                    return badRequest("Missing jws", res);
+                }
+                String username = JwtUtil.getUsername(jws.get());
+                Optional<User> u = service.getByUsername(username);
+                if(!u.isPresent()) {
+                    return notFound(res);
+                }
+                res.type("application/json");
+                return u.get().getRole();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
         get("/user", (req, res) -> {
             try {
                 Optional<String> jws = JwtUtil.parseJws(req);

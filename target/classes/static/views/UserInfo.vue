@@ -1,7 +1,6 @@
 <template>
     <div>
         <main-navigation>
-            <router-link to="/">Home</router-link>
         </main-navigation>
         <div id="userinfo-main">
             <div id="userinfo-container">

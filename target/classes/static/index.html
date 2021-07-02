@@ -38,6 +38,29 @@
         const routes = [
             {
                 path: '/',
+                beforeEnter: (to, from, next) => {
+                    if(localStorage.jws) {
+                        axios.get('/user/role', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                            .then(r => {
+                                if(r.data == 'REGULAR') {
+                                    next({name: 'Home'});
+                                } else if (r.data == 'ADMIN') {
+                                    next({name: 'Admin'});
+                                } else if (r.data == 'MANAGER') {
+                                    next({name: 'Manager'});
+                                } else {
+                                    next({name: 'Home'});
+                                }
+                            })
+                            .catch(() => next({name: 'Home'}));
+                    } else {
+                        next({name: 'Home'});
+                    }
+                },
+            },
+
+            {
+                path: '/home',
                 name: 'Home',
                 component: httpVueLoader('views/Home.vue'),
             },
