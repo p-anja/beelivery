@@ -16,6 +16,12 @@ public class Responses {
         return res;
     }
 
+    public static Response forbidden(Response res) {
+        res.body("Forbidden");
+        res.status(403);
+        return res;
+    }
+
     public static Response notFound(Response res) {
         res.body("Not found");
         res.status(404);

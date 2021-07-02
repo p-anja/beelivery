@@ -4,9 +4,9 @@
             <h2>Admin users overview</h2>
             <div id="search">
                 <div class="search-container">
-                    <input type="text" placeholder="Username" v-model="username">
-                    <input type="text" placeholder="First name" v-model="fname">
-                    <input type="text" placeholder="Last name" v-model="lname">
+                    <input type="text" placeholder="Username" v-model="username" @keyup="search">
+                    <input type="text" placeholder="First name" v-model="fname"  @keyup="search">
+                    <input type="text" placeholder="Last name" v-model="lname"   @keyup="search">
                 </div>
                 <div id="sort-container">
                     <p @click="sort('username')">Username<span v-if="sortBy == 'username'" v-html="sortSymbol"></span></p>
@@ -31,8 +31,9 @@
                     <div class="user-header">
                         <h3>{{user.username}}</h3>
                         <p>{{user.firstName}} {{user.lastName}}</p>
-                        <b>{{user.role}}</b>
-                        <b>{{user.type}}</b>
+                        <b class="role">{{user.role}}</b>
+                        <b :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
+                        <span>Points: {{user.points}}</span>
                     </div>
                 </div>
             </div>
@@ -46,11 +47,10 @@ module.exports = {
         return {
             sortBy: 'username',
             sortDirection: 'asc',
-
             lname: '',
             fname: '',
             username: '',
-            roles: ["ADMIN", "MANAGER", "USER"],
+            roles: ["ADMIN", "MANAGER", "REGULAR"],
             types: ["BRONZE", "SILVER", "GOLD"],
             selectedType: '',
             selectedRole: '',
@@ -84,6 +84,38 @@ module.exports = {
     },
 
     methods: {
+        search: function() {
+            clearTimeout(this.timeout);
+            this.results = [];
+            let self = this;
+            this.timeout = setTimeout(function() {
+                self.getUsers();
+            }, 1000);
+        },
+
+        getUsers: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            this.users = [];
+            let query = '?username=' + this.username + '&fname=' + this.fname + '&lname=' + this.lname;
+            axios.get('/admin/users' + query, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(r => {
+                    let users = r.data;
+                    users.forEach(u => {
+                        if(!u.points) {
+                            u.points = 0.0;
+                        }
+                        if(!u.memberType) {
+                            u.memberType = 'NONE';
+                        }
+                    });
+                    this.users = [...users];
+                })
+                .catch(r => console.log(r));
+        },
+
         sort: function(s) {
             if(this.sortBy == s) {
                 this.sortDirection = this.sortDirection == 'asc' ? 'desc' : 'asc';
@@ -110,19 +142,10 @@ module.exports = {
                 return 0;
             });
             if(this.selectedType) {
-                res = res.filter(u => u.type == this.selectedType);
+                res = res.filter(u => u.memberType == this.selectedType);
             }
             if(this.selectedRole) {
                 res = res.filter(u => u.role == this.selectedRole);
-            }
-            if(this.username) {
-                res = res.filter(u => u.username.toLowerCase().includes(this.username.toLowerCase()));
-            }
-            if(this.lname) {
-                res = res.filter(u => u.lastName.toLowerCase().includes(this.lname.toLowerCase()));
-            }
-            if(this.fname) {
-                res = res.filter(u => u.firstName.toLowerCase().includes(this.fname.toLowerCase()));
             }
             return res;
         },
@@ -130,6 +153,10 @@ module.exports = {
         sortSymbol: function() {
             return this.sortDirection=='asc' ? '&#x25B2;' : '&#x25BC;'
         },
+    },
+
+    mounted() {
+        this.getUsers();
     },
 };
 </script>
@@ -172,8 +199,11 @@ module.exports = {
     }
 
     .user-header b {
-        color: #aaa;
         text-transform: uppercase;
+    }
+
+    .role {
+        color: #aaa;
     }
 
     #search {
@@ -198,6 +228,18 @@ module.exports = {
         cursor: pointer;
         padding: 10px;
         user-select: none;
+    }
+
+    .bronze {
+        color: #cd7f32;
+    }
+
+    .silver {
+        color: #c0c0c0;
+    }
+
+    .gold {
+        color: #ffd700;
     }
     
 </style>

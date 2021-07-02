@@ -45,7 +45,7 @@
                                 if(r.data == 'REGULAR') {
                                     next({name: 'Home'});
                                 } else if (r.data == 'ADMIN') {
-                                    next({name: 'Admin'});
+                                    next({path: '/admin'});
                                 } else if (r.data == 'MANAGER') {
                                     next({name: 'Manager'});
                                 } else {
@@ -106,7 +106,6 @@
 
             {
                 path: '/admin',
-                name: 'Admin',
                 component: httpVueLoader('views/Admin.vue'),
                 children: [
                     {

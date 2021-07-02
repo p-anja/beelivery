@@ -3,7 +3,9 @@ package beelivery;
 import static spark.Spark.*;
 
 import beelivery.misc.RuntimeTypeAdapterFactory;
+import beelivery.user.controller.AdminController;
 import beelivery.user.controller.UserController;
+import beelivery.user.model.Admin;
 import beelivery.user.model.Regular;
 import beelivery.user.model.User;
 import beelivery.user.repository.UserRepository;
@@ -24,7 +26,8 @@ public class Application {
     };
     public static void main(String[] args) {
         RuntimeTypeAdapterFactory<User> userAdapterFactory = RuntimeTypeAdapterFactory.of(User.class)
-                .registerSubtype(Regular.class);
+                .registerSubtype(Regular.class)
+                .registerSubtype(Admin.class);
 
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(userAdapterFactory)
@@ -36,6 +39,7 @@ public class Application {
         UserRepository userRepository = new UserRepository("regulars.json");
         UserService userService = new UserService(userRepository);
         UserController userController = new UserController(userService);
+        AdminController adminController = new AdminController(userService);
 
     }
 }
