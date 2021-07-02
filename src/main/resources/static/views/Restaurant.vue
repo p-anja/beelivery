@@ -1,18 +1,17 @@
 <template>
     <div>
         <main-navigation>
-            <router-link to="/">Home</router-link>
         </main-navigation>
         <div id="rest-main">
             <div id="rest-container">
                 <div id="rest-cover">
-                    <img src="img/profile_placeholder.png" alt="cover">
+                    <img :src="'http://localhost:8080/image/' + restaurant.logoFilepath" alt="cover">
                 </div>
                 <div id="rest-info">
                     <div id="rest-header">
                         <div>
                             <h1>{{restaurant.name}}</h1>
-                            <b :class="restaurant.status == 'Open' ? 'open' : 'closed'">{{restaurant.status}}</b>
+                            <b :class="restaurant.status == 'OPEN' ? 'open' : 'closed'">{{restaurant.status}}</b>
                             <p>{{restaurant.type}}</p>
                         </div>
                         <div class="spacer"></div>
@@ -41,7 +40,7 @@
                             <h2>What we offer</h2>
                             <div id="articles-container">
                                 <div class="articles">
-                                    <div v-for="article in articles" :key="article.name" class="article">
+                                    <div v-for="article in restaurant.articles" :key="article.name" class="article">
                                         <div class="article-info">
                                             <h3>{{article.name}}</h3>
                                             <p>{{article.description}}</p>
@@ -75,7 +74,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="review-container">
+                                <div v-if="allowedToComment" id="review-container">
                                     <h3>Share your thoughts</h3>
                                     <label>Rating: </label>
                                     <b>{{review.rating}} / 5</b>
@@ -96,8 +95,8 @@
 
 module.exports = {
     data: () => ({
-        allowedToComment: true,
-        isManager: true,
+        allowedToComment: false,
+        isManager: false,
         isAdmin: false,
         review: {
             rating: 1,
@@ -163,36 +162,72 @@ module.exports = {
             },
         },
     }),
-    mounted() {
-        this.map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
+
+    methods: {
+        getRole: function() {
+            if(!localStorage.jws) {
+                return;
+            }
+            axios.get('/user/role', {headers: {'Authorization': localStorage.jws}})
+                .then(r => {
+                    if(r.data == 'ADMIN') {
+                        this.isAdmin = true;
+                    }
+                    if(r.data == 'MANAGER') {
+                        this.isManager = true;
+                    }
+                    if(r.data == 'REGULAR') {
+                        // TODO can comment
+                    }
                 })
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]),
-                zoom: 15
+        },
+
+        getRestaurant: async function() {
+            let name = this.$route.params.name;
+            return axios.get('/restaurant/' + name);
+        },
+
+    },
+
+    mounted() {
+        this.getRestaurant()
+            .then(r => {
+                this.restaurant = r.data;
+                this.map = new ol.Map({
+                target: 'map',
+                layers: [
+                    new ol.layer.Tile({
+                        source: new ol.source.OSM()
+                    })
+                ],
+                view: new ol.View({
+                    center: ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]),
+                    zoom: 15
+                    })
+                });
+                let restPointer = new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]))
+                });
+                restPointer.setStyle(
+                    new ol.style.Style({
+                        image: new ol.style.Icon({
+                            crossOrigin: 'anonymous',
+                            src: 'img/map-marker-icon.png',
+                            scale: 0.02,
+                        }),
+                    })
+                );
+                var layer = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [ restPointer,
+                    ]})});
+                this.map.addLayer(layer);
             })
-        });
-        let restPointer = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat([this.restaurant.address.lon, this.restaurant.address.lat]))
-        });
-        restPointer.setStyle(
-            new ol.style.Style({
-                image: new ol.style.Icon({
-                    crossOrigin: 'anonymous',
-                    src: 'img/map-marker-icon.png',
-                    scale: 0.02,
-                }),
-            })
-        );
-        var layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-            features: [ restPointer,
-            ]})});
-        this.map.addLayer(layer);
+            .catch(r => {
+                console.log(r);
+                this.$router.push('/');
+            });
+        
     },
 };
 </script>

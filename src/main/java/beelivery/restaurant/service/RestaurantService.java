@@ -49,4 +49,11 @@ public class RestaurantService {
         return res;
     }
 
+    public Optional<Restaurant> getByName(String name) {
+        if(name.isBlank()) {
+            return Optional.empty();
+        }
+        return repository.getAll().stream().filter(r -> r.getName().equals(name)).findFirst();
+    }
+
 }

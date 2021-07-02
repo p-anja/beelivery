@@ -4,7 +4,7 @@ import static spark.Spark.*;
 
 import beelivery.misc.ImageController;
 import beelivery.misc.RuntimeTypeAdapterFactory;
-import beelivery.restaurant.RestaurantController;
+import beelivery.restaurant.controller.RestaurantController;
 import beelivery.restaurant.repository.RestaurantRepository;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.controller.AdminController;
