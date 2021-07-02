@@ -6,7 +6,7 @@
         <div v-else id="rest-container">
             <div id="rest-profile-and-info">
                 <div id="rest-profile">
-                    <img src="img/profile_placeholder.png" alt="">
+                    <img :src="'http://localhost:8080/image/' + restaurant.logoFilepath" alt="">
                     <div id="rest-header">
                         <h2>{{restaurant.name}}</h2>
                         <b :class="restaurant.status == 'OPEN' ? 'open' : 'closed'">{{restaurant.status}}</b>
@@ -34,7 +34,7 @@
                     <div class="info-container">
                         <div class="info">
                             <b>Type of restaurant</b>
-                            <b id="type">{{restaurant.type}}</b>
+                            <b id="type">{{restaurant.restType}}</b>
                         </div>
                         <div class="info">
                             <b>No. of customers</b>
@@ -42,11 +42,11 @@
                         </div>
                         <div class="info">
                             <b>No. of orders</b>
-                            <router-link to="manager/orders">{{restaurant.orderCount}}</router-link>
+                            <p>{{restaurant.orderCount}}</p>
                         </div>
                         <div class="info">
                             <b>No. of comments</b>
-                            <router-link to="manager/comments">{{restaurant.commentCount}}</router-link>
+                            <p>{{restaurant.commentCount}}</p>
                         </div>
                     </div>
             </div>
@@ -58,22 +58,28 @@
 <script>
 module.exports = {
     data: () => ({
-        restaurant: {
-            name: 'HAO',
-            type: 'Chinese',
-            status: 'Open',
-            customerCount: 3,
-            orderCount: 12,
-            commentCount: 2,
-            address: {
-                lat: 1.0,
-                lon: 1.0,
-                city: 'Novi Sad',
-                street: 'Temerinska',
-                streetNo: '43',
-            },
+        restaurant: null,
+    }),
+    methods: {
+        getRestaurant: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.get('/manager/restaurant', {headers: {'Authorization': 'Bearer ' + localStorage.jws }})
+                .then(r => {
+                    this.restaurant = r.data;
+                })
+                .catch(r => {
+                    console.log(r);
+                    this.$router.push('/');
+                });
         },
-    })
+    },
+
+    mounted() {
+        this.getRestaurant();
+    },
 };
 </script>
 

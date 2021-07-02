@@ -8,6 +8,7 @@ import beelivery.restaurant.controller.RestaurantController;
 import beelivery.restaurant.repository.RestaurantRepository;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.controller.AdminController;
+import beelivery.user.controller.ManagerController;
 import beelivery.user.controller.UserController;
 import beelivery.user.model.Admin;
 import beelivery.user.model.Manager;
@@ -56,6 +57,7 @@ public class Application {
         RestaurantRepository restaurantRepository = new RestaurantRepository("restaurants.json");
         RestaurantService restaurantService = new RestaurantService(restaurantRepository);
         RestaurantController restaurantController = new RestaurantController(restaurantService);
+        ManagerController managerController = new ManagerController(userService);
         AdminController adminController = new AdminController(userService, restaurantService);
 
     }
