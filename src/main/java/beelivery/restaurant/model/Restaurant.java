@@ -15,31 +15,35 @@ public class Restaurant implements IIdentifiable<Integer> {
     private ERestType restType;
     private Address address;
     private String logoFilepath;
+    private ERestStatus status;
     private boolean deleted;
 
-    public Restaurant(Integer id, String name, List<Article> articles, ERestType restType, Address address, String logoFilepath) {
+    public Restaurant(Integer id, String name, List<Article> articles, ERestType restType, Address address, String logoFilepath, ERestStatus status) {
         this.id = id;
         this.name = name;
         this.articles = articles;
         this.restType = restType;
         this.address = address;
         this.logoFilepath = logoFilepath;
+        this.status = status;
     }
 
-    public Restaurant(String name, List<Article> articles, ERestType restType, Address address, String logoFilepath) {
+    public Restaurant(String name, List<Article> articles, ERestType restType, Address address, String logoFilepath, ERestStatus status) {
         this.name = name;
         this.articles = articles;
         this.restType = restType;
         this.address = address;
         this.logoFilepath = logoFilepath;
+        this.status = status;
     }
 
-    public Restaurant(String name, ERestType restType, Address address, String logoFilepath) {
+    public Restaurant(String name, ERestType restType, Address address, String logoFilepath, ERestStatus status) {
         this.name = name;
         this.articles = new ArrayList<Article>();
         this.restType = restType;
         this.address = address;
         this.logoFilepath = logoFilepath;
+        this.status = status;
     }
 
     public void addArticle(Article a) {
@@ -119,5 +123,13 @@ public class Restaurant implements IIdentifiable<Integer> {
 
     public void setManagerUsername(String managerUsername) {
         this.managerUsername = managerUsername;
+    }
+
+    public ERestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ERestStatus status) {
+        this.status = status;
     }
 }

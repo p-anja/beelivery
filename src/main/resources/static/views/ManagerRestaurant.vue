@@ -9,7 +9,7 @@
                     <img src="img/profile_placeholder.png" alt="">
                     <div id="rest-header">
                         <h2>{{restaurant.name}}</h2>
-                        <b :class="restaurant.status == 'Open' ? 'open' : 'closed'">{{restaurant.status}}</b>
+                        <b :class="restaurant.status == 'OPEN' ? 'open' : 'closed'">{{restaurant.status}}</b>
                         <router-link :to="'/restaurant/' + restaurant.name">Go to restaurant page &#62;</router-link>
                     </div>
                 </div>

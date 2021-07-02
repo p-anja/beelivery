@@ -1,6 +1,7 @@
 package beelivery.restaurant.service;
 
 import beelivery.restaurant.dto.RestaurantRequest;
+import beelivery.restaurant.model.ERestStatus;
 import beelivery.restaurant.model.Restaurant;
 import beelivery.restaurant.repository.RestaurantRepository;
 
@@ -16,7 +17,8 @@ public class RestaurantService {
     }
 
     public Optional<Restaurant> create(RestaurantRequest req, String filename) throws IOException {
-        Restaurant r = new Restaurant(req.getName(), req.getType(), req.getAddress(), filename);
+        // Not specified how to set open/closed
+        Restaurant r = new Restaurant(req.getName(), req.getType(), req.getAddress(), filename, ERestStatus.OPEN);
         r.setManagerUsername(req.getManagerUsername());
         Integer id = repository.getNextId();
         r.setId(id);
