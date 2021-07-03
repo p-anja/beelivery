@@ -1,10 +1,12 @@
 package beelivery.user.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Regular extends User {
 
-    // orders
+    private List<String> orders;
     private Cart cart;
     private double points;
     private EMemberType memberType;
@@ -14,6 +16,7 @@ public class Regular extends User {
         this.points = points;
         this.memberType = memberType;
         this.cart = new Cart(username);
+        this.orders = new ArrayList<String>();
     }
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
@@ -21,6 +24,25 @@ public class Regular extends User {
         this.points = 0.0;
         this.memberType = EMemberType.BRONZE;
         this.cart = new Cart(username);
+        this.orders = new ArrayList<String>();
+    }
+
+    public void addOrder(String orderId) {
+        if(!orders.contains(orderId)) {
+            orders.add(orderId);
+        }
+    }
+
+    public boolean removeOrder(String orderId) {
+        return orders.remove(orderId);
+    }
+
+    public List<String> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<String> orders) {
+        this.orders = orders;
     }
 
     public Cart getCart() {

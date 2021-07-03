@@ -24,10 +24,11 @@
                     </div>
                 </div>
                 <div class="spacer"></div>
+                <b class="error">{{errors.order}}</b>
                 <div id="cart-actions">
                     <b>Your total: {{totalPrice}}</b>
                     <div class="spacer"></div>
-                    <button class="button-primary" :disabled="cartItems.length <= 0">Order</button>
+                    <button class="button-primary" :disabled="cartItems.length <= 0" @click="createOrder">Order</button>
                 </div>
             </div>
         </div>
@@ -37,6 +38,9 @@
 <script>
 module.exports = {
     data: () => ({
+        errors: {
+            order: '',
+        },
         cartItems: [
             {
                 article: {
@@ -51,6 +55,21 @@ module.exports = {
     }),
 
     methods: {
+        createOrder: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            this.errors.order = '';
+
+            axios.post('/user/order', {}, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.push('/orders'))
+                .catch(r => {
+                    console.log(r);
+                    this.errors.order = 'Failed to create';
+                });
+        },
+
         deleteArticle: function(ci) {
             if(!localStorage.jws) {
                 this.$router.push('/');

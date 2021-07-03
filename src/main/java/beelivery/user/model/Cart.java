@@ -5,16 +5,38 @@ import beelivery.restaurant.model.Article;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Cart {
     private String username;
     private double price;
     private List<CartItem> items;
+    private String restaurantName;
 
     public Cart(String username) {
         this.username = username;
         this.price = 0.0;
         items = new ArrayList<CartItem>();
+    }
+
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    public void clear() {
+        items.clear();
+        restaurantName = "";
+        recalculatePrice();
+    }
+
+    public List<Article> getArticles() {
+        return items.stream()
+            .map(ci -> ci.getArticle())
+            .collect(Collectors.toList());
     }
 
     private void recalculatePrice() {

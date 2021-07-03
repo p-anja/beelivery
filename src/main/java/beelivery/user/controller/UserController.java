@@ -1,6 +1,7 @@
 package beelivery.user.controller;
 
 import beelivery.misc.JwtUtil;
+import beelivery.order.service.OrderService;
 import beelivery.user.dto.*;
 import beelivery.user.model.ERole;
 import beelivery.user.model.Regular;
@@ -18,6 +19,7 @@ import static spark.Spark.*;
 
 public class UserController {
     private UserService service;
+    private OrderService orderService;
 
     public UserController(UserService service) {
         this.service = service;
@@ -103,6 +105,35 @@ public class UserController {
                 return service.addToCart((Regular)u.get(), items, restName)
                     ? ok("Added", res)
                     : badRequest("Not added", res);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/user/order", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                Regular r = (Regular) u.get();
+                return service.createOrder(r)
+                    ? ok("Added", res)
+                    : badRequest("Not added", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/user/order", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                return gson.toJson(service.getUserOrders(u.get().getUsername()));
             } catch (Exception e) {
                 e.printStackTrace();
                 return internal(res);

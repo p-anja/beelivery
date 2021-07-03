@@ -1,6 +1,8 @@
 package beelivery.user.service;
 
 import beelivery.misc.JwtUtil;
+import beelivery.order.model.Order;
+import beelivery.order.service.OrderService;
 import beelivery.restaurant.model.Article;
 import beelivery.restaurant.model.Restaurant;
 import beelivery.restaurant.service.RestaurantService;
@@ -15,16 +17,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static beelivery.misc.Responses.badRequest;
-import static beelivery.misc.Responses.forbidden;
-
 public class UserService {
     private UserRepository repository;
     private RestaurantService restaurantService;
+    private OrderService orderService;
 
-    public UserService(UserRepository repository, RestaurantService restaurantService) {
+    public UserService(UserRepository repository, RestaurantService restaurantService, OrderService orderService) {
         this.repository = repository;
         this.restaurantService = restaurantService;
+        this.orderService = orderService;
     }
 
     public Optional<String> login(LoginRequest req) {
@@ -83,6 +84,26 @@ public class UserService {
         return u;
     }
 
+    public boolean createOrder(Regular r) {
+        String restName = r.getCart().getRestaurantName();
+        if(restName == null || restName.isBlank()) {
+            return false;
+        }
+        Optional<Restaurant> rest = restaurantService.getByName(restName);
+        if(!rest.isPresent()) {
+            return false;
+        }
+
+        r.addOrder(orderService.createOrder(r.getCart(), rest.get(), r.getUsername(),
+            r.getFirstName(), r.getLastName()));
+        r.getCart().clear();
+        return repository.update(r);
+    }
+
+    public List<Order> getUserOrders(String username) {
+        return orderService.getByUsername(username);
+    }
+
     public boolean addToCart(Regular r, List<CartItemRequest> itemsReq, String restName) {
         List<Article> articles = restaurantService.getArticlesByRestaurantName(restName);
         List<CartItem> newItems;
@@ -91,6 +112,7 @@ public class UserService {
             .map(ci -> new CartItem(ci, i.getAmount())))
             .collect(Collectors.toList());
         newItems.forEach(ni -> r.getCart().addArticle(ni));
+        r.getCart().setRestaurantName(restName);
         return updateUser(r);
     }
 

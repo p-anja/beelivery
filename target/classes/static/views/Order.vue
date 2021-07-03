@@ -4,7 +4,7 @@
         </main-navigation>
         <div id="order-main">
             <div id="order-container">
-                <div v-if="step==1" id="articles-select">
+                <div id="articles-select">
                     <h2>Choose your articles</h2>
                     <div id="articles-container">
                         <div v-for="article in articles" :key="article.name" class="article">
@@ -29,46 +29,11 @@
                         </div>
                     </div>
                     <div class="spacer"></div>
+                    <b class="error">{{errors.cart}}</b>
                     <div id="total-select">
                         <b>Total price: {{totalPrice.toFixed(2)}} &#8364;</b>
                         <div class="spacer"></div>
-                        <button :disabled="totalPrice <= 0" @click="++step">Preview</button>
-                    </div>
-                </div>
-                <div v-if="step==2" id="articles-preview">
-                    <h2>Your order</h2>
-                    <div id="preview-container">
-                        <div id="articles-container">
-                            <div v-for="article in selectedArticles" :key="article.name" class="article">
-                                <div :class="article.selected ? 'article-info selected' : 'article-info'">
-                                    <div @click="article.selected = !article.selected" class="article-header">
-                                        <h3>{{article.name}}</h3>
-                                        <p>{{article.description}}</p>
-                                    </div>
-                                    <div class="price-and-amount">
-                                        <b>{{article.price}} &#8364;</b>
-                                        <div class="spacer"></div>
-                                        <input
-                                        v-if="article.selected"
-                                        type="number"
-                                        min="1"
-                                        v-model="article.count"
-                                        @blur="article.count = article.count < 1 ? 1 : article.count">
-                                    </div>
-                                </div>
-                                <div class="spacer"></div>
-                                <img :src="'http://localhost:8080/image/' + article.imageFilepath"  alt="article pic">
-                            </div>
-                        </div>
-                        <div id="order-info">
-                            <b>Your total: {{totalPrice}} &#8364;</b>
-                            <div>
-                                <button @click="--step">Back</button>
-                                <div class="spacer"></div>
-                                <b class="error">{{errors.cart}}</b>
-                                <button class="button-primary" :disabled="totalPrice <= 0" @click="addToCart">Add to cart</button>
-                            </div>
-                        </div>
+                        <button class="button-primary" :disabled="totalPrice <= 0" @click="addToCart">Add to cart</button>
                     </div>
                 </div>
             </div>
@@ -82,7 +47,6 @@ module.exports = {
         errors: {
             cart: '',
         },
-        step: 1,
 
         articles: [
             {
