@@ -94,6 +94,10 @@ public class UserService {
         return updateUser(r);
     }
 
+    public boolean removeFromCart(Regular r, String articleName) {
+        return r.getCart().removeArticle(articleName) && updateUser(r);
+    }
+
     public boolean addRestaurantToManager(String username, Restaurant r) {
         Optional<User> u = getByUsername(username);
         if(!u.isPresent() || !u.get().getRole().equals(ERole.MANAGER)) {

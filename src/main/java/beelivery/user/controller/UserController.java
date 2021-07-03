@@ -14,14 +14,31 @@ import java.util.Optional;
 
 import static beelivery.Application.gson;
 import static beelivery.misc.Responses.*;
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class UserController {
     private UserService service;
 
     public UserController(UserService service) {
         this.service = service;
+
+        delete("/user/cart/:aname", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if (!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String articleName = req.params(":aname");
+                if (articleName == null || articleName.isBlank()) {
+                    return badRequest("Not deleted", res);
+                }
+                return service.removeFromCart((Regular) u.get(), articleName)
+                        ? ok("Deleted", res)
+                        : badRequest("Not deleted", res);
+            } catch (Exception e) {
+                return internal(res);
+            }
+        });
 
         post("/user/register", (req, res) -> {
             try {
