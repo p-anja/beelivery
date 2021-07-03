@@ -1,7 +1,6 @@
 <template>
     <div>
         <main-navigation>
-            <router-link to="/">Home</router-link>
         </main-navigation>
         <div id="admin-main">
             <div id="admin-container">

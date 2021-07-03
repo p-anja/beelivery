@@ -1,7 +1,10 @@
 package beelivery.user.service;
 
 import beelivery.misc.JwtUtil;
+import beelivery.restaurant.model.Article;
 import beelivery.restaurant.model.Restaurant;
+import beelivery.restaurant.service.RestaurantService;
+import beelivery.user.dto.CartItemRequest;
 import beelivery.user.dto.LoginRequest;
 import beelivery.user.dto.RegisterRequest;
 import beelivery.user.model.*;
@@ -17,9 +20,11 @@ import static beelivery.misc.Responses.forbidden;
 
 public class UserService {
     private UserRepository repository;
+    private RestaurantService restaurantService;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, RestaurantService restaurantService) {
         this.repository = repository;
+        this.restaurantService = restaurantService;
     }
 
     public Optional<String> login(LoginRequest req) {
@@ -76,6 +81,17 @@ public class UserService {
             return Optional.empty();
         }
         return u;
+    }
+
+    public boolean addToCart(Regular r, List<CartItemRequest> itemsReq, String restName) {
+        List<Article> articles = restaurantService.getArticlesByRestaurantName(restName);
+        List<CartItem> newItems;
+        newItems = itemsReq.stream().flatMap(i -> articles.stream()
+            .filter(a -> a.getName().equals(i.getArticleName()))
+            .map(ci -> new CartItem(ci, i.getAmount())))
+            .collect(Collectors.toList());
+        newItems.forEach(ni -> r.getCart().addArticle(ni));
+        return updateUser(r);
     }
 
     public boolean addRestaurantToManager(String username, Restaurant r) {

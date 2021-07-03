@@ -9,6 +9,7 @@ import beelivery.user.dto.ArticleRequest;
 import beelivery.user.model.Manager;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class RestaurantService {
             return false;
         }
 
-        if(a.get().isDeleted()) {
+        if(a.isPresent() && a.get().isDeleted()) {
             a.get().setDeleted(false);
             a.get().setName(req.getName());
             a.get().setArticleType(req.getArticleType());
@@ -45,6 +46,14 @@ public class RestaurantService {
         r.addArticle(new Article(req.getName(), req.getArticleType(), r.getId(), req.getAmount(), req.getDescription(),
             req.getImageFilepath(), req.getPrice()));
         return repository.update(r);
+    }
+
+    public List<Article> getArticlesByRestaurantName(String name) {
+        Optional<Restaurant> r = getByName(name);
+        if(!r.isPresent()) {
+            return Collections.emptyList();
+        }
+        return r.get().getArticles();
     }
 
     public boolean updateArticleInRestaurant(Manager m, ArticleRequest req) {

@@ -1,15 +1,15 @@
 package beelivery.user.controller;
 
 import beelivery.misc.JwtUtil;
-import beelivery.user.dto.LoginRequest;
-import beelivery.user.dto.RegisterRequest;
-import beelivery.user.dto.RegularResponse;
-import beelivery.user.dto.UserResponse;
+import beelivery.user.dto.*;
 import beelivery.user.model.ERole;
 import beelivery.user.model.Regular;
 import beelivery.user.model.User;
 import beelivery.user.service.UserService;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Optional;
 
 import static beelivery.Application.gson;
@@ -67,6 +67,40 @@ public class UserController {
                         : badRequest("Failed to update", res);
             } catch (Exception e) {
                 e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/user/cart/:restname", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String restName = req.params(":restname");
+                if(restName == null || restName.isBlank()) {
+                    return badRequest("Bad request", res);
+                }
+                Type type = new TypeToken<List<CartItemRequest>>(){}.getType();
+                List<CartItemRequest> items = gson.fromJson(req.body(), type);
+                return service.addToCart((Regular)u.get(), items, restName)
+                    ? ok("Added", res)
+                    : badRequest("Not added", res);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        get("/user/cart", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                Regular r = (Regular) u.get();
+                return gson.toJson(r.getCart().getItems());
+            } catch (Exception e) {
                 return internal(res);
             }
         });

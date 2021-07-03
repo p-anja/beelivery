@@ -50,13 +50,14 @@ public class Application {
 
         ImageController imageController = new ImageController(UPLOAD_DIR);
 
-        UserRepository userRepository = new UserRepository("users.json");
-        UserService userService = new UserService(userRepository);
-        UserController userController = new UserController(userService);
-
         RestaurantRepository restaurantRepository = new RestaurantRepository("restaurants.json");
         RestaurantService restaurantService = new RestaurantService(restaurantRepository);
         RestaurantController restaurantController = new RestaurantController(restaurantService);
+
+        UserRepository userRepository = new UserRepository("users.json");
+        UserService userService = new UserService(userRepository, restaurantService);
+        UserController userController = new UserController(userService);
+
         ManagerController managerController = new ManagerController(userService, restaurantService);
         AdminController adminController = new AdminController(userService, restaurantService);
 
