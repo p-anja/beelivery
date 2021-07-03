@@ -1,7 +1,6 @@
 <template>
     <div>
         <main-navigation>
-            <router-link to="/">Home</router-link>
         </main-navigation>
         <div id="order-main">
             <div id="order-container">
@@ -25,8 +24,8 @@
                                     @blur="article.amount = article.amount < 1 ? 1 : article.amount">
                                 </div>
                             </div>
-                            <img src="img/profile_placeholder.png" alt="article pic">
                             <div class="spacer"></div>
+                            <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
                         </div>
                     </div>
                     <div class="spacer"></div>
@@ -53,12 +52,12 @@
                                         v-if="article.selected"
                                         type="number"
                                         min="1"
-                                        v-model="article.amount"
-                                        @blur="article.amount = article.amount < 1 ? 1 : article.amount">
+                                        v-model="article.count"
+                                        @blur="article.count = article.count < 1 ? 1 : article.count">
                                     </div>
                                 </div>
-                                <img src="img/profile_placeholder.png" alt="article pic">
                                 <div class="spacer"></div>
+                                <img :src="'http://localhost:8080/image/' + article.imageFilepath"  alt="article pic">
                             </div>
                         </div>
                         <div id="order-info">
@@ -66,7 +65,8 @@
                             <div>
                                 <button @click="--step">Back</button>
                                 <div class="spacer"></div>
-                                <button class="button-primary" :disabled="totalPrice <= 0">Confirm order</button>
+                                <b class="error">{{errors.cart}}</b>
+                                <button class="button-primary" :disabled="totalPrice <= 0" @click="addToCart">Add to cart</button>
                             </div>
                         </div>
                     </div>
@@ -79,6 +79,9 @@
 <script>
 module.exports = {
     data: () => ({
+        errors: {
+            cart: '',
+        },
         step: 1,
 
         articles: [
@@ -88,6 +91,7 @@ module.exports = {
                 price: 30.4,
                 selected: false,
                 amount: 1,
+                count: 1,
             },
             {
                 name: 'Pizza 2',
@@ -95,6 +99,7 @@ module.exports = {
                 price: 43.4,
                 selected: false,
                 amount: 1,
+                count: 1,
             },
             {
                 name: 'Pizza 3',
@@ -102,6 +107,7 @@ module.exports = {
                 price: 23.0,
                 selected: false,
                 amount: 1,
+                count: 1,
             },
             {
                 name: 'Pizza 4',
@@ -109,9 +115,42 @@ module.exports = {
                 price: 24.0,
                 selected: false,
                 amount: 1,
+                count: 1,
             },
         ],
     }),
+
+    methods: {
+        addToCart: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            this.errors.cart = '';
+            let data = [];
+            this.selectedArticles.forEach(a => {
+                data.push({
+                    articleName: a.name,
+                    amount: a.count,
+                });
+            });
+            axios.post('/user/cart/' + this.$route.params.name, data, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.go(-1))
+                .catch(r => this.errors.cart = 'Failed to add');
+        },
+
+        getArticles: function() {
+            axios.get('/restaurant/' + this.$route.params.name + '/article')
+                .then(r => {
+                    let articles = r.data;
+                    articles.forEach(a => {
+                        a.count = 1;
+                        a.selected = false;
+                    });
+                    this.articles = articles;
+                });
+        },
+    },
 
     computed: {
         selectedArticles: function() {
@@ -132,6 +171,9 @@ module.exports = {
             });
             return res;
         },
+    },
+    mounted() {
+        this.getArticles();
     },
 };
 
@@ -188,6 +230,10 @@ module.exports = {
     .article img {
         width: 128px;
         height: 128px;
+    }
+
+    .article-info {
+        width: 320px;
     }
 
     .article-info h3 {

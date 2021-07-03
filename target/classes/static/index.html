@@ -104,6 +104,12 @@
             },
 
             {
+                path: '/orders',
+                name: 'Orders',
+                component: httpVueLoader('views/Orders.vue'),
+            },
+
+            {
                 path: '/cart',
                 name: 'Cart',
                 component: httpVueLoader('views/Cart.vue'),
@@ -202,6 +208,18 @@
 
     input[type="text"]:disabled {
         background: #ddd;
+    }
+
+    button:disabled {
+        background: #eee;
+        color: #666;
+        border-color: #666;
+    }
+    
+    button:disabled:hover {
+        background: #eee;
+        color: #666;
+        border-color: #666;
     }
     </style>
 </body>

@@ -13,9 +13,16 @@
 					<div id="nav-links">
 						<slot></slot>
 						<div id="user-controls" v-if="jws">
-							<router-link to="/userinfo">Profile</router-link>
-							<router-link id="cart" to="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></router-link>
-							<a href="#" @click="logout">Logout</a>
+							<div class="dropdown">
+								<router-link class="dropbtn" to="/userinfo">Profile</router-link>
+								<div class="dropdown-content">
+									<router-link to="/userinfo">Profile info</router-link>
+									<router-link v-if="role == 'REGULAR'" to="/cart">Cart</router-link>
+									<router-link to="/orders">Orders</router-link>
+									<hr/>
+									<a href="#" @click="logout">Logout</a>
+								</div>
+							</div>
 						</div>
 						<router-link v-else to="/signin">Login</router-link>
 					</div>
@@ -32,11 +39,19 @@
 			return{
 				search: '',
 				active: false,
+				role: '',
 			}
 
 		},
 		methods:
 		{
+			getRole: function() {
+				if(!localStorage.jws) {
+					return;
+				}
+				axios.get('/user/role', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+					.then(r => this.role = r.data);
+			},
 			logout: function() {
 				localStorage.removeItem('jws');
 				this.$router.go();
@@ -62,6 +77,7 @@
 		},
         mounted()
         {
+			this.getRole();
         },
 	}
 </script>
@@ -201,8 +217,47 @@
 		flex-direction: row;
 	}
 
-	#nav-links #cart {
-		font-size: 2rem;
+	.dropdown {
+		position:relative;
+		display: inline-block;
+	}
+
+	.dropdown-content {
+		display: none;
+		position: absolute;
+		background-color: #fff;
+		min-width: 160px;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		z-index: 99;
+	}
+
+	.dropdown-content hr {
+		width: 90%;
+		margin: 0 auto;
+		color: #eee;
+	}
+
+	#nav-links .dropdown .dropdown-content a:hover {
+		color: #fff;
+		font-weight: 500;
+		background: #e12454;
+	}
+
+
+	.dropdown:hover .dropdown-content {
+		display: block;
+	}
+
+	#nav-links .dropdown .dropbtn {
+		padding-bottom: 0;
+		padding-top: 0;
+	}
+	
+	.dropbtn {
+		content: '';
+		display: inline-block;
+		vertical-align: middle;
+		height: 100%;
 	}
 
 </style>
