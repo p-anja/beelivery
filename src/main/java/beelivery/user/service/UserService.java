@@ -31,6 +31,10 @@ public class UserService {
         return Optional.of(JwtUtil.generateJws(u.get()));
     }
 
+    public boolean updateUser(User user) {
+        return repository.update(user);
+    }
+
     public boolean updateUser(RegisterRequest req) {
         Optional<User> u = getByUsername(req.getUsername());
         if (!u.isPresent()) {

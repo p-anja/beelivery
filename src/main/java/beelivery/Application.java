@@ -57,7 +57,7 @@ public class Application {
         RestaurantRepository restaurantRepository = new RestaurantRepository("restaurants.json");
         RestaurantService restaurantService = new RestaurantService(restaurantRepository);
         RestaurantController restaurantController = new RestaurantController(restaurantService);
-        ManagerController managerController = new ManagerController(userService);
+        ManagerController managerController = new ManagerController(userService, restaurantService);
         AdminController adminController = new AdminController(userService, restaurantService);
 
     }

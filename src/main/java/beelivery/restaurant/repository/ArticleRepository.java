@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.util.List;
 
-public class ArticleRepository extends JSONRepository<Article, Integer> {
+public class ArticleRepository extends JSONRepository<Article, String> {
     public ArticleRepository(String filename) {
         super(filename, new TypeToken<List<Article>>(){}.getType());
     }

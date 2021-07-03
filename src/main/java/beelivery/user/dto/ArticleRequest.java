@@ -1,21 +1,18 @@
-package beelivery.restaurant.model;
+package beelivery.user.dto;
 
-import beelivery.misc.IIdentifiable;
+import beelivery.restaurant.model.EArticleType;
 
-public class Article implements IIdentifiable<String> {
+public class ArticleRequest {
     private String name;
     private EArticleType articleType;
-    private Integer restaurantId;
     private double amount;
-    private double price;
     private String description;
     private String imageFilepath;
-    private boolean deleted;
+    private double price;
 
-    public Article(String name, EArticleType articleType, Integer restaurantId, double amount, String description, String imageFilepath, double price) {
+    public ArticleRequest(String name, EArticleType articleType, double amount, String description, String imageFilepath, double price) {
         this.name = name;
         this.articleType = articleType;
-        this.restaurantId = restaurantId;
         this.amount = amount;
         this.description = description;
         this.imageFilepath = imageFilepath;
@@ -28,16 +25,6 @@ public class Article implements IIdentifiable<String> {
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    @Override
-    public String getId() {
-        return name;
-    }
-
-    @Override
-    public void setId(String id) {
-        this.name = id;
     }
 
     public String getName() {
@@ -54,14 +41,6 @@ public class Article implements IIdentifiable<String> {
 
     public void setArticleType(EArticleType articleType) {
         this.articleType = articleType;
-    }
-
-    public Integer getRestaurantId() {
-        return restaurantId;
-    }
-
-    public void setRestaurantId(Integer restaurantId) {
-        this.restaurantId = restaurantId;
     }
 
     public double getAmount() {
@@ -86,15 +65,5 @@ public class Article implements IIdentifiable<String> {
 
     public void setImageFilepath(String imageFilepath) {
         this.imageFilepath = imageFilepath;
-    }
-
-    @Override
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    @Override
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }

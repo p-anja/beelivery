@@ -13,7 +13,6 @@
                             <h1>{{restaurant.name}}</h1>
                             <b :class="restaurant.status == 'OPEN' ? 'open' : 'closed'">{{restaurant.status}}</b>
                             <p>{{restaurant.type}}</p>
-                            {{isManager}}
                         </div>
                         <div class="spacer"></div>
                         <div id="score-and-buy">
@@ -41,14 +40,48 @@
                             <h2>What we offer</h2>
                             <div id="articles-container">
                                 <div class="articles">
-                                    <div v-for="article in restaurant.articles" :key="article.name" class="article">
-                                        <div class="article-info">
-                                            <h3>{{article.name}}</h3>
-                                            <p>{{article.description}}</p>
-                                            <b>{{article.price}} &#8364;</b>
+                                    <div v-for="article in articles" :key="article.name">
+                                        <div v-if="!article.edit" class="article">
+                                            <div class="article-info">
+                                                <h3>{{article.name}} {{article.articleAmount}}
+                                                    <span v-if="article.articleType == 'FOOD'">g</span>
+                                                    <span v-else>ml</span>
+                                                    <span v-if="isManager" @click="editArticle(article, true)" class="edit-article-pencil">
+                                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                    </span>
+                                                </h3>
+                                                <b>{{article.articleType}}</b>
+                                                <p>{{article.description}}</p>
+                                                <b>{{article.price}} &#8364;</b>
+                                                <b>{{article.edit}}</b>
+                                            </div>
+                                            <div class="spacer"></div>
+                                            <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
                                         </div>
-                                        <div class="spacer"></div>
-                                        <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
+                                        <div v-else-if="isManager && article.edit" clas="edit-article">
+                                            <div class="edit-article-info">
+                                                <label>Name</label>
+                                                <input type="text" v-model="article.name"
+                                                @blur="article.name = !article.name ? 'Enter name' : article.name">
+                                                <select v-model="article.articleType">
+                                                    <option value="DRINK">Drink</option>
+                                                    <option value="FOOD">Food</option>
+                                                </select>
+                                                <label>Price</label>
+                                                <input type="number" v-model="article.price"
+                                                @blur="article.price = article.price <= 0 ? article.price = 1 : article.price">
+                                                <label>Amount <span v-if="article.articleType == 'FOOD'">g</span><span v-else>ml</span></label>
+                                                <input type="number" v-model="article.amount">
+                                                <label>Description</label>
+                                                <textarea v-model="article.description" cols="30" rows="10"></textarea>
+                                            </div>
+                                            <div class="edit-article-actions">
+                                                <button @click="editArticle(article, false)">Cancel</button>
+                                                <div class="spacer"></div>
+                                                <button class="button-deny" @click="deleteArticle(article)">Delete</button>
+                                                <button class="button-primary" @click="updateArticle(article)">Update</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-if="isManager" id="new-article-container">
@@ -58,13 +91,14 @@
                                             <input type="text" placeholder="Article name" v-model="articleName">
                                             <div id="price-and-type">
                                                 <input type="number" min="1" v-model="articlePrice"
-                                                @blur="articlPrice = articlePrice < 1 ? 1 : articlePrice">
+                                                placeholder="Price"
+                                                @blur="articlePrice = articlePrice < 1 ? 1 : articlePrice">
                                                 <select v-model="articleType">
                                                     <option value="DRINK">Drink</option>
                                                     <option value="FOOD">Food</option>
                                                 </select>
                                             </div>
-                                            <input type="number" :placeholder="articleType == 'DRINK' ? 'amount (ml)' : 'amount (g)'"
+                                            <input type="number" :placeholder="articleType == 'DRINK' ? 'Amount (ml)' : 'Amount (g)'"
                                                 v-model="articleAmount"
                                                 min="1"
                                                  @blur="articleAmount = articleAmount < 1 ? 1 : articleAmount">
@@ -101,6 +135,7 @@
                                         <div v-if="(isManager || isAdmin) && comment.status == 'Pending'" class="comment-actions">
                                             <button class="button-approve">Approve</button>
                                             <div class="spacer"></div>
+                                            <b :class="articleSuccess ? 'success' : 'error'">{{errors.article}}</b>
                                             <button class="button-deny">Deny</button>
                                         </div>
                                     </div>
@@ -128,13 +163,15 @@ module.exports = {
     data: () => ({
         imgKey: 1,
         articleName: '',
-        articlePrice: 1,
+        articlePrice: '',
         articleType: 'DRINK',
-        articleAmount: 1,
+        articleAmount: '',
         articleDescription: '',
+        articleSuccess: false,
         errors: {
             articleName: '',
             articleProfile: '',
+            article: '',
         },
         file: '',
         fileUrl: '',
@@ -166,29 +203,6 @@ module.exports = {
             },
         ],
 
-        articles: [
-            {
-                name: 'Pizza 1',
-                description: 'Pizza 1 description. Has some tunas and stuff',
-                price: 30.4,
-            },
-            {
-                name: 'Pizza 2',
-                description: 'Pizza 2 description. Has some tunas and stuff',
-                price: 43.4,
-            },
-            {
-                name: 'Pizza 3',
-                description: 'Pizza 3 description. Has some tunas and stuff',
-                price: 23.0,
-            },
-            {
-                name: 'Pizza 4',
-                description: 'Pizza 4 description. Has some tunas and stuff',
-                price: 24.0,
-            },
-        ],
-
         map: null,
         restaurant: {
             name: "Liman",
@@ -207,6 +221,113 @@ module.exports = {
     }),
 
     methods: {
+        deleteArticle: function(ar) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            axios.delete('/manager/restaurant/article/' + ar.name, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getRestaurant().then(r => {
+                        this.restaurant = r.data;
+                        this.restaurant.articles.forEach(a => {
+                            a.edit = false;
+                        })
+                    })
+                })
+                .catch(r => console.log(r));
+        },
+
+        updateArticle: function(ar) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            let data = {
+                name: ar.name,
+                articleType: ar.articleType,
+                amount: ar.amount,
+                description: ar.description,
+                price: ar.price,
+            };
+
+            axios.put('/manager/restaurant/article', data, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getRestaurant().then(r => {
+                        this.restaurant = r.data;
+                        this.restaurant.articles.forEach(a => {
+                            a.edit = false;
+                        })
+                    })
+                })
+                .catch(r => console.log(r));
+        },
+
+        editArticle: function(a, val) {
+            this.restaurant.articles.forEach(a => a.edit = false);
+            a.edit = val;
+            this.restaurant.articles = [...this.restaurant.articles];
+        },
+        validateArticle: function() {
+            let nameValid = !!this.articleName;
+            let profileValid = !!this.file;
+
+            this.errors.articleName = nameValid ? '' : 'Enter article name';
+            this.errors.articleProfile = profileValid ? '' : 'Select image';
+            this.errors.article = '';
+            this.articleSuccess = false;
+
+            return nameValid && profileValid;
+        },
+
+        addArticle: function() {
+            if(!this.validateArticle()) {
+                return;
+            }
+
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            let request = {
+                name: this.articleName,
+                articleType: this.articleType,
+                price: this.articlePrice,
+                amount: this.articleAmount,
+                description: this.articleDescription,
+                imageFilepath: '',
+            };
+
+            let data = new FormData();
+            data.append('file', this.file);
+            data.append('request', JSON.stringify(request));
+
+            let config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + localStorage.jws,
+                },
+            };
+            axios.post('/manager/restaurant/article', data, config)
+                .then(() => {
+                    this.getRestaurant().then(r => {
+                        this.restaurant = r.data;
+                        this.restaurant.articles.forEach(a => {
+                            a.edit = false;
+                        });
+                    });
+                    this.articleSuccess = true;
+                })
+                .catch(r => {
+                    console.log(r);
+                    this.errors.article = 'Failed to add';
+                    this.articleSuccess = false;
+                });
+        },
+
         selectArticleFile: function() {
             this.file = '';
             if(this.fileUrl) {
@@ -229,8 +350,11 @@ module.exports = {
                         this.isAdmin = true;
                     }
                     if(r.data == 'MANAGER') {
-                        console.log('ismanager');
-                        this.isManager = true;
+                        if(!localStorage.jws) {
+                            return;
+                        }
+                        axios.get('/manager/isowner/' + this.$route.params.name, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                            .then(() => this.isManager = true);
                     }
                     if(r.data == 'REGULAR') {
                         // TODO can comment
@@ -250,6 +374,9 @@ module.exports = {
         this.getRestaurant()
             .then(r => {
                 this.restaurant = r.data;
+                this.restaurant.articles.forEach(a => {
+                    a.edit = false;
+                });
                 this.map = new ol.Map({
                 target: 'map',
                 layers: [
@@ -284,7 +411,14 @@ module.exports = {
                 console.log(r);
                 this.$router.push('/');
             });
-        
+    },
+    computed: {
+        articles: function() {
+            if(this.restaurant) {
+                return this.restaurant.articles.filter(a => !a.deleted);
+            }
+            return [];
+        }
     },
 };
 </script>
@@ -519,7 +653,18 @@ module.exports = {
         display: grid;
         place-items: center;
         background: #eee;
-        font-size: 10rem;
+        font-size: 5rem;
     }    
+
+    .edit-article-pencil {
+        color: #666;
+        font-size: 2rem;
+    }
+
+    .edit-article-actions {
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+    }
 
 </style>

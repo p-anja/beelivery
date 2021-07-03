@@ -1,9 +1,12 @@
 package beelivery.restaurant.service;
 
 import beelivery.restaurant.dto.RestaurantRequest;
+import beelivery.restaurant.model.Article;
 import beelivery.restaurant.model.ERestStatus;
 import beelivery.restaurant.model.Restaurant;
 import beelivery.restaurant.repository.RestaurantRepository;
+import beelivery.user.dto.ArticleRequest;
+import beelivery.user.model.Manager;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,6 +19,63 @@ public class RestaurantService {
 
     public RestaurantService(RestaurantRepository repository) {
         this.repository = repository;
+    }
+
+    public boolean addArticleToRestaurant(Manager m, ArticleRequest req) {
+        Restaurant r = m.getRestaurant();
+        if(r == null) {
+            return false;
+        }
+
+        Optional<Article> a = r.getArticles().stream().filter(ar -> ar.getName().equals(req.getName())).findFirst();
+        if(a.isPresent() && !a.get().isDeleted()) {
+            return false;
+        }
+
+        if(a.get().isDeleted()) {
+            a.get().setDeleted(false);
+            a.get().setName(req.getName());
+            a.get().setArticleType(req.getArticleType());
+            a.get().setAmount(req.getAmount());
+            a.get().setDescription(req.getDescription());
+            a.get().setPrice(req.getPrice());
+            return repository.update(r);
+        }
+
+        r.addArticle(new Article(req.getName(), req.getArticleType(), r.getId(), req.getAmount(), req.getDescription(),
+            req.getImageFilepath(), req.getPrice()));
+        return repository.update(r);
+    }
+
+    public boolean updateArticleInRestaurant(Manager m, ArticleRequest req) {
+        Restaurant r = m.getRestaurant();
+        if(r == null) {
+            return false;
+        }
+        Optional<Article> a = r.getArticles().stream().filter(ar -> ar.getName().equals(req.getName()) && !ar.isDeleted()).findFirst();
+        if(!a.isPresent()) {
+            return false;
+        }
+
+        a.get().setName(req.getName());
+        a.get().setArticleType(req.getArticleType());
+        a.get().setAmount(req.getAmount());
+        a.get().setDescription(req.getDescription());
+        a.get().setPrice(req.getPrice());
+        return repository.update(r);
+    }
+
+    public boolean deleteArticleFromRestaurant(Manager m, String name) {
+        Restaurant r = m.getRestaurant();
+        if(m == null) {
+            return false;
+        }
+        Optional<Article> a = r.getArticles().stream().filter(ar -> ar.getName().equals(name) && !ar.isDeleted()).findFirst();
+        if(!a.isPresent()) {
+            return false;
+        }
+        a.get().setDeleted(true);
+        return repository.update(r);
     }
 
     public Optional<Restaurant> create(RestaurantRequest req, String filename) throws IOException {
