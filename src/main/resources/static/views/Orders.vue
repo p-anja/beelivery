@@ -4,7 +4,7 @@
         </main-navigation>
         <div id="cart-main">
             <div id="search-container">
-                <input type="text" placeholder="Restaurant" v-model="restaurantName" @keydown.enter="getOrders">
+                <input v-if="role != 'MANAGER'" type="text" placeholder="Restaurant" v-model="restaurantName" @keydown.enter="getOrders">
                 <div id="sort-container">
                     <p @click="sort('restaurant.name')">Restaurant<span v-if="sortBy == 'restaurant.name'" v-html="sortSymbol"></span></p>
                     <p @click="sort('date')">Date<span v-if="sortBy == 'date'" v-html="sortSymbol"></span></p>

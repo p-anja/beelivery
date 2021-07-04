@@ -29,6 +29,12 @@ public class Regular extends User {
 
     public void addPoints(double pts) {
         points += pts;
+        if(points >= 3000 && points < 5000) {
+            memberType = EMemberType.SILVER;
+        }
+        if(points >= 5000) {
+            memberType = EMemberType.GOLD;
+        }
     }
 
     public void subtractPoints(double pts) {

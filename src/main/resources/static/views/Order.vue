@@ -14,7 +14,9 @@
                                     <p>{{article.description}}</p>
                                 </div>
                                 <div class="price-and-amount">
-                                    <b>{{article.price}} &#8364;</b>
+                                    <b>
+                                        {{article.price}} &#8364;
+                                    </b>
                                     <div class="spacer"></div>
                                     <input
                                     v-if="article.selected"
@@ -31,7 +33,10 @@
                     <div class="spacer"></div>
                     <b class="error">{{errors.cart}}</b>
                     <div id="total-select">
-                        <b>Total price: {{totalPrice.toFixed(2)}} &#8364;</b>
+                        <b>
+                            Total price: {{calculateWithDiscount(totalPrice).toFixed(2)}} &#8364;
+                            <span v-if="discountPercent" class="discount">(-{{discountPercent}} %)</span>
+                        </b>
                         <div class="spacer"></div>
                         <button class="button-primary" :disabled="totalPrice <= 0" @click="addToCart">Add to cart</button>
                     </div>
@@ -44,6 +49,8 @@
 <script>
 module.exports = {
     data: () => ({
+        discountPercent: 0.0,
+
         errors: {
             cart: '',
         },
@@ -85,6 +92,16 @@ module.exports = {
     }),
 
     methods: {
+
+        getDiscount: function(){
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.get('/user/discount', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(r => this.discountPercent = r.data);
+        },
+
         addToCart: function() {
             if(!localStorage.jws) {
                 this.$router.push('/');
@@ -114,6 +131,9 @@ module.exports = {
                     this.articles = articles;
                 });
         },
+        calculateWithDiscount: function(price) {
+            return price * (100.0 - this.discountPercent) / 100.0;
+        },
     },
 
     computed: {
@@ -138,6 +158,7 @@ module.exports = {
     },
     mounted() {
         this.getArticles();
+        this.getDiscount();
     },
 };
 
@@ -240,5 +261,9 @@ module.exports = {
     #order-info div {
         display: flex;
         flex-direction: row;
+    }
+
+    .discount {
+        color: #2ecc71;
     }
 </style>

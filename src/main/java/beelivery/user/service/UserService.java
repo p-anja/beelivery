@@ -217,11 +217,21 @@ public class UserService {
     public boolean addToCart(Regular r, List<CartItemRequest> itemsReq, String restName) {
         List<Article> articles = restaurantService.getArticlesByRestaurantName(restName);
         List<CartItem> newItems;
+        double modifier = 1.0;
+        if(r.getMemberType().equals(EMemberType.SILVER)) {
+            modifier = 0.97;
+        } else if(r.getMemberType().equals(EMemberType.GOLD)) {
+            modifier = 0.95;
+        }
+        final double m = modifier;
         newItems = itemsReq.stream().flatMap(i -> articles.stream()
             .filter(a -> a.getName().equals(i.getArticleName()))
             .map(ci -> new CartItem(ci, i.getAmount())))
             .collect(Collectors.toList());
-        newItems.forEach(ni -> r.getCart().addArticle(ni));
+        newItems.forEach(ni -> {
+            ni.getArticle().setPrice(ni.getArticle().getPrice() * m);
+            r.getCart().addArticle(ni);
+        });
         r.getCart().setRestaurantName(restName);
         return updateUser(r);
     }

@@ -42,7 +42,7 @@ public class Cart {
     private void recalculatePrice() {
         price = 0.0;
         for(CartItem i : items) {
-            price += i.getArticle().getPrice() * i.getAmount();
+            price += i.getPrice();
         }
     }
 

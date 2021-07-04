@@ -14,7 +14,7 @@ public class CartItem {
     }
 
     public double getPrice() {
-        return price;
+        return article.getPrice() * amount;
     }
 
     public void setPrice(double price) {

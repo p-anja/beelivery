@@ -6,7 +6,7 @@
             <div id="cart-container">
                 <h1>Your cart</h1>
                 <div id="articles">
-                    <div v-for="ci in cartItems" :key="ci.article.name" class="article">
+                    <div v-for="ci in cart.items" :key="ci.article.name" class="article">
                         <div class="article-container">
                             <div class="article-info">
                                 <h3>{{ci.article.name}} {{ci.article.amount}} <span v-if="ci.article.articleType == 'FOOD'">g</span><span v-else>ml</span></h3>
@@ -26,9 +26,9 @@
                 <div class="spacer"></div>
                 <b class="error">{{errors.order}}</b>
                 <div id="cart-actions">
-                    <b>Your total: {{totalPrice}}</b>
+                    <b>Your total: {{cart.price}}</b>
                     <div class="spacer"></div>
-                    <button class="button-primary" :disabled="cartItems.length <= 0" @click="createOrder">Order</button>
+                    <button class="button-primary" :disabled="cart.items.length <= 0" @click="createOrder">Order</button>
                 </div>
             </div>
         </div>
@@ -41,17 +41,10 @@ module.exports = {
         errors: {
             order: '',
         },
-        cartItems: [
-            {
-                article: {
-                    name: 'Pizzaa',
-                    amount: 300,
-                    articleType: 'FOOD',
-                },
-                amount: 3,
-                price: 900,
-            },
-        ],
+        cart: {
+            items: [],
+            price: 0.0,
+        },
     }),
 
     methods: {
@@ -90,19 +83,9 @@ module.exports = {
 
             axios.get('/user/cart', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
                 .then(r => {
-                    this.cartItems = r.data;
+                    this.cart = r.data;
                 })
                 .catch(r => console.log(r));
-        },
-    },
-
-    computed: {
-        totalPrice: function() {
-            let retval = 0.0;
-            this.cartItems.forEach(ci => {
-                retval += ci.price;
-            });
-            return retval;
         },
     },
 

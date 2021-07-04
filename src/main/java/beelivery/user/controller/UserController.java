@@ -194,6 +194,30 @@ public class UserController {
             }
         });
 
+        get("/user/discount", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                Regular r = (Regular) u.get();
+                switch (r.getMemberType()) {
+                    case BRONZE: {
+                        return 0.0;
+                    }
+                    case SILVER: {
+                        return 3.0;
+                    }
+                    case GOLD: {
+                        return 5.0;
+                    }
+                }
+                return 0.0;
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
         get("/user/order", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req);
@@ -321,7 +345,7 @@ public class UserController {
                     return forbidden(res);
                 }
                 Regular r = (Regular) u.get();
-                return gson.toJson(r.getCart().getItems());
+                return gson.toJson(r.getCart());
             } catch (Exception e) {
                 return internal(res);
             }
