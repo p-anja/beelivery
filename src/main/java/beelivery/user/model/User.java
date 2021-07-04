@@ -14,6 +14,7 @@ public abstract class User implements IIdentifiable<String>, Serializable {
     protected ERole role;
     protected Date birthDate;
     protected String profileImg;
+    protected boolean blocked;
     protected boolean deleted;
 
     public User(String username, String password, String firstName, String lastName, ESex sex, ERole role, Date birthDate) {
@@ -26,6 +27,15 @@ public abstract class User implements IIdentifiable<String>, Serializable {
         this.birthDate = birthDate;
         this.deleted = false;
         this.profileImg = "";
+        this.blocked = false;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public String getProfileImg() {

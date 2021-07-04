@@ -29,7 +29,7 @@
             <div id="user-cards">
                 <div v-for="user in sortedResults" :key="user.username" class="user-card">
                     <div class="user-header">
-                        <h3>{{user.username}}</h3>
+                        <h3 :class="user.cancelCount >= 5 ? 'suspicious' : ''">{{user.username}}</h3>
                         <p>{{user.firstName}} {{user.lastName}}</p>
                         <b class="role">{{user.role}}</b>
                         <b v-if="user.memberType" :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
@@ -40,6 +40,8 @@
                         <img v-if="user.profileImg" :src="'http://localhost:8080/image/' + user.profileImg">
                         <img v-else src="img/profile_placeholder.png" alt="profile">
                         <div class="spacer"></div>
+                        <button v-if="user.role != 'ADMIN' && !user.blocked" @click="blockUser(user.username)">Block</button>
+                        <button v-else-if="user.role != 'ADMIN' && user.blocked" @click="unblockUser(user.username)">Unblock</button>
                         <button v-if="user.role != 'ADMIN'" class="button-delete" @click="deleteUser(user.username)">Delete</button>
                     </div>
                 </div>
@@ -91,6 +93,26 @@ module.exports = {
     },
 
     methods: {
+        blockUser: function(username) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.post('/admin/user/block/' + username, {}, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.getUsers())
+                .catch(r => console.log(r));
+        },
+
+        unblockUser: function(username) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.post('/admin/user/unblock/' + username, {}, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.getUsers())
+                .catch(r => console.log(r));
+        },
+
         deleteUser: function(username) {
             if(!localStorage.jws) {
                 this.$router.push('/');
@@ -272,6 +294,11 @@ module.exports = {
     .button-delete {
         color: #fff;
         background-color: #e74c3c;
+    }
+
+    .suspicious {
+        font-weight: 500;
+        color: #e74c3c;
     }
 
 </style>

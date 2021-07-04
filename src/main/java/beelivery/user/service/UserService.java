@@ -13,6 +13,7 @@ import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.dto.CartItemRequest;
 import beelivery.user.dto.LoginRequest;
 import beelivery.user.dto.RegisterRequest;
+import beelivery.user.dto.RestInfoResponse;
 import beelivery.user.model.*;
 import beelivery.user.repository.UserRepository;
 import spark.Request;
@@ -33,6 +34,36 @@ public class UserService {
         this.restaurantService = restaurantService;
         this.orderService = orderService;
         this.commentService = commentService;
+    }
+
+    public RestInfoResponse getRestaurantInfo(Manager m) {
+        RestInfoResponse info = new RestInfoResponse(0, 0, 0);
+        Restaurant r = m.getRestaurant();
+        if(r == null) {
+            return info;
+        }
+        info.setOrderCount(orderService.getRestaurantOrderCount(r.getName()));
+        info.setCommentCount(commentService.getRestaurantCommentCount(r.getName()));
+        info.setCustomerCount(orderService.getRestaurantCustomerCount(r.getName()));
+        return info;
+    }
+
+    public boolean blockUser(String username) {
+        Optional<User> u = getByUsername(username);
+        if(!u.isPresent()) {
+            return false;
+        }
+        u.get().setBlocked(true);
+        return updateUser(u.get());
+    }
+
+    public boolean unblockUser(String username) {
+        Optional<User> u = getByUsername(username);
+        if(!u.isPresent()) {
+            return false;
+        }
+        u.get().setBlocked(false);
+        return updateUser(u.get());
     }
 
     public boolean deleteUser(String username) {
@@ -153,6 +184,7 @@ public class UserService {
         }
 
         r.subtractPoints(orderPrice / 1000 * 133 * 4);
+        r.incCancelCount();
         return updateUser(r);
     }
 
@@ -309,7 +341,17 @@ public class UserService {
     }
 
     public List<User> getAll() {
-        return repository.getAll();
+        return repository.getAll().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList());
     }
 
+    public List<Regular> getRestaurantCustomers(Manager m) {
+        Restaurant r = m.getRestaurant();
+        if(r == null) {
+            return Collections.emptyList();
+        }
+        return orderService.getRestaurantCustomerUsernames(r.getName()).stream().flatMap(un -> getAll().stream()
+                .filter(u -> u.getUsername().equals(un))
+                .map(user -> (Regular) user))
+                .collect(Collectors.toList());
+    }
 }

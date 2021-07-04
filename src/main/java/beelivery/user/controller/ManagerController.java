@@ -196,6 +196,31 @@ public class ManagerController {
             }
         });
 
+        get("/manager/customer", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if (!u.isPresent()) {
+                    return forbidden(res);
+                }
+                return gson.toJson(service.getRestaurantCustomers((Manager) u.get()));
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/manager/info", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if (!u.isPresent()) {
+                    return forbidden(res);
+                }
+                return gson.toJson(service.getRestaurantInfo((Manager) u.get()));
+            } catch(Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
         get("/manager/requests", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req, ERole.MANAGER);

@@ -10,6 +10,7 @@ import beelivery.user.model.Cart;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class OrderService {
@@ -27,6 +28,23 @@ public class OrderService {
         order.setArticles(cart.getArticles());
         repository.create(order);
         return id;
+    }
+
+    public long getRestaurantOrderCount(String restName) {
+        return repository.getAll().stream().filter(o -> o.getRestaurant().getName().equals(restName)
+            && !o.isDeleted()).count();
+    }
+
+    public long getRestaurantCustomerCount(String restName) {
+        return repository.getAll().stream().collect(Collectors.toMap(
+            Order::getUsername, Function.identity(),
+            (o1, o2) -> o1)).keySet().stream().count();
+    }
+
+    public List<String> getRestaurantCustomerUsernames(String restName) {
+        return repository.getAll().stream().collect(Collectors.toMap(
+                Order::getUsername, Function.identity(),
+                (o1, o2) -> o1)).keySet().stream().collect(Collectors.toList());
     }
 
     public Optional<Order> get(String id) {

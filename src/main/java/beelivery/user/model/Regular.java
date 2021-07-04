@@ -10,6 +10,7 @@ public class Regular extends User {
     private Cart cart;
     private double points;
     private EMemberType memberType;
+    private int cancelCount;
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate, double points, EMemberType memberType) {
         super(username, password, firstName, lastName, sex, ERole.REGULAR, birthDate);
@@ -17,6 +18,8 @@ public class Regular extends User {
         this.memberType = memberType;
         this.cart = new Cart(username);
         this.orders = new ArrayList<String>();
+        this.cancelCount = 0;
+        this.blocked = false;
     }
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
@@ -25,6 +28,28 @@ public class Regular extends User {
         this.memberType = EMemberType.BRONZE;
         this.cart = new Cart(username);
         this.orders = new ArrayList<String>();
+        this.cancelCount = 0;
+        this.blocked = false;
+    }
+
+    public void incCancelCount() {
+        ++cancelCount;
+    }
+
+    public int getCancelCount() {
+        return cancelCount;
+    }
+
+    public void setCancelCount(int cancelCount) {
+        this.cancelCount = cancelCount;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public void addPoints(double pts) {

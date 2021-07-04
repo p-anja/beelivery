@@ -11,6 +11,15 @@ public class Delivery extends User {
     public Delivery(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
         super(username, password, firstName, lastName, sex, ERole.DELIVERY, birthDate);
         orders = new ArrayList<String>();
+        blocked = false;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public void addOrder(String orderId) {

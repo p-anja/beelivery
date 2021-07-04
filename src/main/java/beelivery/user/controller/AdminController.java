@@ -139,6 +139,44 @@ public class AdminController {
             }
         });
 
+        post("/admin/user/unblock/:username", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String username = req.params(":username");
+                if(username == null || username.isBlank()) {
+                    return badRequest("Bad username", res);
+                }
+                return service.unblockUser(username)
+                        ? ok("Unblocked", res)
+                        : badRequest("Not unblocked", res);
+            } catch(Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/admin/user/block/:username", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String username = req.params(":username");
+                if(username == null || username.isBlank()) {
+                    return badRequest("Bad username", res);
+                }
+                return service.blockUser(username)
+                        ? ok("Blocked", res)
+                        : badRequest("Not blocked", res);
+            } catch(Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
         get("/admin/managers", (req, res) -> {
             try {
                 if(!service.validateJWS(req, ERole.ADMIN).isPresent()) {

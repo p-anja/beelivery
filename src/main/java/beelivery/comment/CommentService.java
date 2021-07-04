@@ -22,6 +22,10 @@ public class CommentService {
         return repository.create(c);
     }
 
+    public long getRestaurantCommentCount(String restName) {
+        return getByRestaurantName(restName).stream().count();
+    }
+
     public List<Comment> getByRestaurantName(String name) {
         return repository.getAll().stream().filter(c -> c.getRestaurantName().equals(name)
             && c.getStatus().equals(ECommentStatus.APPROVED) && !c.isDeleted()).collect(Collectors.toList());

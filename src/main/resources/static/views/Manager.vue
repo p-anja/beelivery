@@ -7,6 +7,7 @@
                 <sidebar title="Manager panel">
                     <router-link to="/manager">Restaurant</router-link>
                     <router-link to="/manager/requests">Requests</router-link>
+                    <router-link to="/manager/customers">Customers</router-link>
                 </sidebar>
                 <div id="manager-view">
                     <router-view />

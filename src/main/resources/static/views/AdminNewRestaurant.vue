@@ -282,6 +282,7 @@ module.exports = {
     #newrest-and-manager {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        gap: 20vw;
     }
 
     #newrest-form {
@@ -334,7 +335,7 @@ module.exports = {
         display: flex;
         flex-direction: column;
         margin-bottom: 0;
-        margin-left: auto;
+        /* margin-left: auto; */
         width: 20vw;
         text-align: left;
     }

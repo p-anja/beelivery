@@ -13,6 +13,15 @@ public class Manager extends User{
     public Manager(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
         super(username, password, firstName, lastName, sex, ERole.MANAGER, birthDate);
         requests = new ArrayList<DeliveryRequest>();
+        blocked = false;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public void addRequest(DeliveryRequest r) {

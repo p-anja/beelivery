@@ -6,4 +6,14 @@ public class Admin extends User {
     public Admin(String username, String password, String firstName, String lastName, ESex sex, ERole role, Date birthDate) {
         super(username, password, firstName, lastName, sex, role, birthDate);
     }
+
+    @Override
+    public boolean isBlocked() {
+        return false;
+    }
+
+    @Override
+    public void setBlocked(boolean blocked) {
+        blocked = false;
+    }
 }

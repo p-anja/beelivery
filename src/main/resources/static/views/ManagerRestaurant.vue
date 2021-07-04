@@ -38,15 +38,15 @@
                         </div>
                         <div class="info">
                             <b>No. of customers</b>
-                            <router-link to="manager/customers">{{restaurant.customerCount}}</router-link>
+                            <router-link to="manager/customers">{{customerCount}}</router-link>
                         </div>
                         <div class="info">
                             <b>No. of orders</b>
-                            <p>{{restaurant.orderCount}}</p>
+                            <p>{{orderCount}}</p>
                         </div>
                         <div class="info">
                             <b>No. of comments</b>
-                            <p>{{restaurant.commentCount}}</p>
+                            <p>{{commentCount}}</p>
                         </div>
                     </div>
             </div>
@@ -59,8 +59,24 @@
 module.exports = {
     data: () => ({
         restaurant: null,
+        commentCount: 0,
+        customerCount: 0,
+        orderCount: 0,
     }),
     methods: {
+        getInfo: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.get('/manager/info', {headers: {'Authorization': 'Bearer ' + localStorage.jws }})
+                .then(r => {
+                    this.commentCount = r.data.commentCount;
+                    this.customerCount = r.data.customerCount;
+                    this.orderCount = r.data.orderCount;
+                })
+        },
+
         getRestaurant: function() {
             if(!localStorage.jws) {
                 this.$router.push('/');
@@ -79,6 +95,7 @@ module.exports = {
 
     mounted() {
         this.getRestaurant();
+        this.getInfo();
     },
 };
 </script>

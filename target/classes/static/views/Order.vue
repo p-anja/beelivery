@@ -10,7 +10,9 @@
                         <div v-for="article in articles" :key="article.name" class="article">
                             <div :class="article.selected ? 'article-info selected' : 'article-info'">
                                 <div @click="article.selected = !article.selected" class="article-header">
-                                    <h3>{{article.name}}</h3>
+                                    <h3>
+                                        {{article.name}} ({{article.amount}} <span v-if="article.artileType == 'FOOD'">g</span> <span v-else>ml</span>)
+                                    </h3>
                                     <p>{{article.description}}</p>
                                 </div>
                                 <div class="price-and-amount">
@@ -22,8 +24,8 @@
                                     v-if="article.selected"
                                     type="number"
                                     min="1"
-                                    v-model="article.amount"
-                                    @blur="article.amount = article.amount < 1 ? 1 : article.amount">
+                                    v-model="article.count"
+                                    @blur="article.count = article.count < 1 ? 1 : article.count">
                                 </div>
                             </div>
                             <div class="spacer"></div>
