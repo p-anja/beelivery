@@ -13,26 +13,32 @@
         </div>
         <div id="card-home">
             <div id="card-container">
-                <div class="card">
-                    <h2 class="card-header">Lorem</h2>
-                    <p class="card-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus asperiores maiores nam quia reprehenderit. Illum tempore quod dignissimos rerum laudantium dolorem iure vero est excepturi autem. Voluptatum architecto corporis fugit.</p>
-                </div>
-                <div class="card">
-                    <h2 class="card-header">Lorem</h2>
-                    <p class="card-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus asperiores maiores nam quia reprehenderit. Illum tempore quod dignissimos rerum laudantium dolorem iure vero est excepturi autem. Voluptatum architecto corporis fugit.</p>
-                </div>
-                <div class="card">
-                    <h2 class="card-header">Lorem</h2>
-                    <p class="card-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus asperiores maiores nam quia reprehenderit. Illum tempore quod dignissimos rerum laudantium dolorem iure vero est excepturi autem. Voluptatum architecto corporis fugit.</p>
+                <div v-for="restaurant in restaurants" :key="restaurant.name" class="card">
+                    <img :src="'http://localhost:8080/image/' + restaurant.logoFilepath" alt="restaurant logo">
+                    <div class="card-header">
+                        <h3>{{restaurant.name}}</h3>
+                        <b :class="restaurant.status.toLowerCase()">{{restaurant.status}}</b>
+                        <b class="card-type">{{restaurant.restType}}</b>
+                        <input
+                            class="rating"
+                            max="5"
+                            oninput="this.style.setProperty('--value', this.value)"
+                            step="0.5"
+                            type="range"
+                            :value="Math.round(restaurant.avgScore*2)/2"
+                            disabled>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="card-actions">
+                        <router-link :to="'/restaurant/' + restaurant.name">Go to page ></router-link>
+                    </div>
                 </div>
             </div>
         </div>
         <div id="find-more">
             <div id="find-more-container">
                 <h2>Find more restaurants of your liking</h2>
-                <button>
-                    Search
-                </button>
+                <router-link tag="button" to="/restsearch">Search</router-link>
             </div>
         </div>
     </div>
@@ -42,13 +48,27 @@
 module.exports = {
     data() {
         return {
+            restaurants: [],
         }
     },
 
     methods: {
+        getRestaurants: function() {
+
+            let query = '?name=&type=&state=&city=&score=';
+            axios.get('/restaurant' + query)
+                .then(r => {
+                    this.restaurants = r.data;
+                    if(this.restaurants) {
+                        this.restaurants = this.restaurants.slice(0, 3);
+                    }
+                })
+                .catch(r => console.log(r));
+        },
     },
 
     mounted() {
+        this.getRestaurants();
     }
 };
 </script>
@@ -101,19 +121,49 @@ module.exports = {
     }
 
     .card {
+        cursor: pointer;
         display: flex;
         flex-grow: 1;
         flex-shrink: 1;
         flex-basis: 0px;
         flex-direction: column;
-        justify-content: space-around;
-        max-width: 20vw;
+        justify-content: flex-start;
+        width: 300px;
         border-radius: 15px 15px 15px 15px;
         box-shadow: 0px 0px 30px 0px rgba(0, 42, 106, 0.1);
-        padding: 2rem;
+        /* padding: 2rem; */
         margin: 0rem 1rem;
         background-color: #fff;
         height: 400px;
+    }
+
+    .card-header {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        padding: 10px 10px 0px 10px;
+    }
+
+    .card-actions {
+        text-align: right;
+        padding: 20px;
+    }
+
+    .card-actions a {
+        color: #222;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .card-actions a:hover {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+    .card img{
+        border-radius: 15px 15px 0px 0px;
+        height: 200px;
+        width: 300px;
     }
 
     #find-more {
@@ -136,4 +186,60 @@ module.exports = {
         align-self: center;
     }
 
+  .open {
+      color: #2ecc71;
+  }
+
+  .closed {
+      color: #e74c3c;
+  }
+
+    .rating {
+    --dir: right;
+    --fill: gold;
+    --fillbg: rgba(100, 100, 100, 0.15);
+    --star: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.25l-6.188 3.75 1.641-7.031-5.438-4.734 7.172-0.609 2.813-6.609 2.813 6.609 7.172 0.609-5.438 4.734 1.641 7.031z"/></svg>');
+    --stars: 5;
+    --starsize: 3rem;
+    --value: 1;
+    --x: calc(100% * (var(--value) / var(--stars)));
+    block-size: var(--starsize);
+    inline-size: calc(var(--stars) * var(--starsize));
+    position: relative;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    background: #fff;
+    }
+[dir="rtl"] .rating {
+  --dir: left;
+}
+.rating::-moz-range-track {
+  background: linear-gradient(to var(--dir), var(--fill) 0 var(--x), var(--fillbg) 0 var(--x));
+  block-size: 100%;
+  mask: repeat left center/var(--starsize) var(--star);
+}
+.rating::-webkit-slider-runnable-track {
+  background: linear-gradient(to var(--dir), var(--fill) 0 var(--x), var(--fillbg) 0 var(--x));
+  block-size: 100%;
+  mask: repeat left center/var(--starsize) var(--star);
+  -webkit-mask: repeat left center/var(--starsize) var(--star);
+}
+.rating::-moz-range-thumb {
+  height: var(--starsize);
+  opacity: 0;
+  width: calc(var(--starsize) / 2);
+}
+.rating::-webkit-slider-thumb {
+  height: var(--starsize);
+  opacity: 0;
+  width: calc(var(--starsize) / 2);
+  -webkit-appearance: none;
+}
+.rating, .rating-label {
+  display: block;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.rating-label {
+  margin-block-end: 1rem;
+}
 </style>

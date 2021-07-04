@@ -52,8 +52,8 @@ public class RestaurantController {
               String type = req.queryParams("type");
               String state = req.queryParams("state");
               String city = req.queryParams("city");
-              double avgScore = Double.parseDouble(req.queryParams("score"));
-              return gson.toJson(service.search(name, type, state, city, avgScore));
+              String avgScoreString = req.queryParams("score");
+              return gson.toJson(service.search(name, type, state, city, avgScoreString));
         });
     }
 }

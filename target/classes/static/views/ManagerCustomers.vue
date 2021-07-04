@@ -10,6 +10,7 @@
                         <b v-if="customer.memberType" :class="customer.memberType.toLowerCase()">{{customer.memberType}}</b>
                         <b>Points: {{customer.points}}</b>
                     </div>
+                    <div class="spacer"></div>
                     <div class="customer-profile">
                         <img v-if="customer.profileImg" :src="'http://localhost:8080/image/' + customer.profileImg" alt="profile">
                         <img v-else src="img/profile_placeholder.png" alt="profile">

@@ -8,7 +8,10 @@
 					</div>
 					<div id="search">
 						<!-- Search text field -->
-						<input placeholder="Search restaurants" type="text" v-model="search" @keyup.enter="$router.push('/restsearch/' + search)">
+						<div id="search-container">
+							<input placeholder="Search restaurants" type="text" v-model="search" @keyup.enter="$router.push('/restsearch/' + search)">
+							<span class="border"></span>
+						</div>
 					</div>
 					<div id="nav-links">
 						<slot></slot>
@@ -210,6 +213,37 @@
 	#search {
 		display: grid;
 		place-items: center;
+	}
+
+	#search-container {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+	}
+
+	#search-container input {
+		border: 0px;
+		border-bottom: solid 1px #eee;
+		padding: 0px;
+		margin: 0px;
+	}
+
+	#search-container input ~ .border {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 0;
+	}
+
+	#search input:focus ~ .border {
+		width: 100%;
+		transition: 0.5s;
+		border: solid 1px var(--accent);
+	}
+
+	.border {
+		border: 0px;
 	}
 
 	#user-controls {
