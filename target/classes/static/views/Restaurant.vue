@@ -125,18 +125,19 @@
                                         <div class="comment-container">
                                             <div class="comment-info">
                                                 <h3>{{comment.username}}</h3>
-                                                <b>{{comment.score}}/5.0</b>
+                                                <b>{{comment.rating}}/5.0</b>
                                                 <b v-if="isManager" :class="comment.status.toLowerCase()">{{comment.status}}</b>
                                                 <p>{{comment.body}}</p>
                                             </div>
                                             <div class="spacer"></div>
-                                            <img src="img/profile_placeholder.png" alt="commenter pic">
+                                            <img :src="'http://localhost:8080/image/' + comment.userProfile" alt="commenter pic">
                                         </div>
-                                        <div v-if="(isManager || isAdmin) && comment.status == 'Pending'" class="comment-actions">
-                                            <button class="button-approve">Approve</button>
+                                        <div v-if="(isManager || isAdmin) && comment.status == 'PENDING'" class="comment-actions">
+                                            <button class="button-approve" v-if="isManager" @click="approveComment(comment.id)">Approve</button>
                                             <div class="spacer"></div>
                                             <b :class="articleSuccess ? 'success' : 'error'">{{errors.article}}</b>
-                                            <button class="button-deny">Deny</button>
+                                            <button class="button-deny" v-if="isManager" >Deny</button>
+                                            <button class="button-deny" v-if="isAdmin">Delete</button>
                                         </div>
                                     </div>
                                 </div>
@@ -145,8 +146,8 @@
                                     <label>Rating: </label>
                                     <b>{{review.rating}} / 5</b>
                                     <input type="range" min="1" max="5" v-model="review.rating"/>
-                                    <textarea view="review.body" cols="30" rows="10"></textarea>
-                                    <button>Add review</button>
+                                    <textarea view="review.body" cols="30" rows="10" v-model="review.body"></textarea>
+                                    <button @click="postComment">Add review</button>
                                 </div>
                             </div>
                         </div>
@@ -221,6 +222,80 @@ module.exports = {
     }),
 
     methods: {
+        approveComment: function(id) {
+            if(!localStorage.jws) {
+                this.$route.push('/');
+                return;
+            }
+
+            axios.post('/manager/comment/approve', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.go(0))
+                .catch(r => console.log(r));
+        },
+
+        declineComment: function(id) {
+            if(!localStorage.jws) {
+                this.$route.push('/');
+                return;
+            }
+
+            axios.post('/manager/comment/decline', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.go(0))
+                .catch(r => console.log(r));
+        },
+
+        deleteComment: function(id) {
+            if(!localStorage.jws) {
+                this.$route.push('/');
+                return;
+            }
+
+            axios.delete('/admin/' + this.$route.params.name + '/comment/' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.go(0))
+                .catch(r => console.log(r));
+        },
+
+        getOwnerComments: function() {
+            if(!localStorage.jws) {
+                this.$route.push('/');
+                return;
+            }
+
+            axios.get('/owner/' + this.$route.params.name + '/comment', {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(r => this.comments.push(...r.data))
+                .catch(r => console.log(r));
+        },
+        getComments: function() {
+            axios.get('/restaurant/' + this.$route.params.name + '/comment')
+                .then(r => this.comments = r.data)
+                .catch(r => consoel.log(r));
+        },
+
+        postComment: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            axios.post('/user/comment/' + this.$route.params.name, this.review, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.$router.go(0))
+                .catch(r => console.log(r));
+        },
+        
+        canComment: function() {
+            if(!localStorage.jws) {
+                return;
+            }
+
+            axios.get('/user/cancomment/' + this.$route.params.name, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.allowedToComment = true;
+                })
+                .catch(() => {
+                    this.allowedToComment = false;
+                });
+        },
+
         deleteArticle: function(ar) {
             if(!localStorage.jws) {
                 this.$router.push('/');
@@ -348,13 +423,17 @@ module.exports = {
                 .then(r => {
                     if(r.data == 'ADMIN') {
                         this.isAdmin = true;
+                        this.getOwnerComments();
                     }
                     if(r.data == 'MANAGER') {
                         if(!localStorage.jws) {
                             return;
                         }
                         axios.get('/manager/isowner/' + this.$route.params.name, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
-                            .then(() => this.isManager = true);
+                            .then(() => {
+                                this.isManager = true;
+                                this.getOwnerComments();
+                            });
                     }
                     if(r.data == 'REGULAR') {
                         // TODO can comment
@@ -370,10 +449,15 @@ module.exports = {
     },
 
     mounted() {
+        this.getComments();
+        this.canComment();
         this.getRole();
         this.getRestaurant()
             .then(r => {
                 this.restaurant = r.data;
+                if(!this.restaurant.articles) {
+                    this.restaurant.articles = [];
+                }
                 this.restaurant.articles.forEach(a => {
                     a.edit = false;
                 });

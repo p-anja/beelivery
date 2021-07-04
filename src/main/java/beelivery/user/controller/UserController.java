@@ -1,5 +1,7 @@
 package beelivery.user.controller;
 
+import beelivery.comment.CommentService;
+import beelivery.comment.dto.CommentRequest;
 import beelivery.misc.JwtUtil;
 import beelivery.order.model.Order;
 import beelivery.order.service.OrderService;
@@ -25,9 +27,12 @@ import static spark.Spark.*;
 public class UserController {
     private UserService service;
     private OrderService orderService;
+    private CommentService commentService;
 
-    public UserController(UserService service) {
+    public UserController(UserService service, OrderService orderService, CommentService commentService) {
         this.service = service;
+        this.orderService = orderService;
+        this.commentService = commentService;
 
         delete("/user/order/:id", (req, res) -> {
             try {
@@ -208,6 +213,66 @@ public class UserController {
                 return gson.toJson(orders);
             } catch (Exception e) {
                 e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/user/comment/:restname", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String restName = req.params(":restname");
+                if(restName == null || restName.isBlank()) {
+                    return badRequest("Invalid restname", res);
+                }
+                CommentRequest cReq = gson.fromJson(req.body(), CommentRequest.class);
+                return service.addComment((Regular) u.get(), cReq, restName)
+                    ? ok("Posted", res)
+                    : badRequest("Not posted", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/owner/:restname/comment", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    u = service.validateJWS(req, ERole.ADMIN);
+                    if(!u.isPresent()) {
+                        return forbidden(res);
+                    }
+                }
+
+                String restName = req.params(":restname");
+                if(restName == null || restName.isBlank()) {
+                    return badRequest("Bad request", res);
+                }
+
+                return gson.toJson(commentService.getOwnerComments(restName));
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/user/cancomment/:restname", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String restName = req.params(":restname");
+                if(restName == null || restName.isBlank()) {
+                    return forbidden(res);
+                }
+
+                return orderService.hasDeliveredOrder(u.get().getUsername(), restName)
+                    ? ok("Can comment", res)
+                    : badRequest("Cannot comment", res);
+            } catch(Exception e) {
                 return internal(res);
             }
         });

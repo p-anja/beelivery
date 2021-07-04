@@ -53,7 +53,7 @@ public class RestaurantService {
         if(!r.isPresent()) {
             return Collections.emptyList();
         }
-        return r.get().getArticles();
+        return r.get().getArticles().stream().filter(a -> !a.isDeleted()).collect(Collectors.toList());
     }
 
     public boolean updateArticleInRestaurant(Manager m, ArticleRequest req) {

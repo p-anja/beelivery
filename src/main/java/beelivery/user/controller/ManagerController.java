@@ -108,6 +108,25 @@ public class ManagerController {
             }
         });
 
+        post("/manager/comment/approve", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String idstr = req.body();
+                if(idstr == null || idstr.isBlank()) {
+                    return badRequest("Invalid comment", res);
+                }
+                Integer id = Integer.parseInt(idstr);
+                return service.approveComment(id)
+                    ? ok("Approved", res)
+                    : badRequest("Not approved", res);
+            } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
         post("/manager/restaurant/article", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req, ERole.MANAGER);

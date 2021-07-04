@@ -2,6 +2,8 @@ package beelivery;
 
 import static spark.Spark.*;
 
+import beelivery.comment.CommentService;
+import beelivery.comment.repository.CommentRepository;
 import beelivery.misc.ImageController;
 import beelivery.misc.LocalDateTimeDeserializer;
 import beelivery.misc.LocalDateTimeSerializer;
@@ -61,13 +63,16 @@ public class Application {
         OrderRepository orderRepository = new OrderRepository("orders.json");
         OrderService orderService = new OrderService(orderRepository);
 
+        CommentRepository commentRepository = new CommentRepository("comments.json");
+        CommentService commentService = new CommentService(commentRepository);
+
         RestaurantRepository restaurantRepository = new RestaurantRepository("restaurants.json");
         RestaurantService restaurantService = new RestaurantService(restaurantRepository);
-        RestaurantController restaurantController = new RestaurantController(restaurantService);
+        RestaurantController restaurantController = new RestaurantController(restaurantService, commentService);
 
         UserRepository userRepository = new UserRepository("users.json");
-        UserService userService = new UserService(userRepository, restaurantService, orderService);
-        UserController userController = new UserController(userService);
+        UserService userService = new UserService(userRepository, restaurantService, orderService, commentService);
+        UserController userController = new UserController(userService, orderService, commentService);
 
         ManagerController managerController = new ManagerController(userService, restaurantService, orderService);
         AdminController adminController = new AdminController(userService, restaurantService);

@@ -1,5 +1,6 @@
 package beelivery.restaurant.controller;
 
+import beelivery.comment.CommentService;
 import beelivery.restaurant.model.Restaurant;
 import beelivery.restaurant.service.RestaurantService;
 
@@ -13,9 +14,20 @@ import static spark.Spark.get;
 public class RestaurantController {
 
     private RestaurantService service;
+    private CommentService commentService;
 
-    public RestaurantController(RestaurantService service) {
+    public RestaurantController(RestaurantService service, CommentService commentService) {
         this.service = service;
+        this.commentService = commentService;
+
+        get("/restaurant/:name/comment", (req, res) -> {
+            res.type("application/json");
+            String name = req.params(":name");
+            if(name == null || name.isBlank()) {
+                return gson.toJson(Collections.emptyList());
+            }
+            return gson.toJson(commentService.getByRestaurantName(name));
+        });
 
         get("/restaurant/:name/article", (req, res) -> {
             res.type("application/json");

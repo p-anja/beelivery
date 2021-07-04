@@ -1,5 +1,8 @@
 package beelivery.user.service;
 
+import beelivery.comment.CommentService;
+import beelivery.comment.dto.CommentRequest;
+import beelivery.comment.model.Comment;
 import beelivery.misc.JwtUtil;
 import beelivery.order.model.EOrderStatus;
 import beelivery.order.model.Order;
@@ -23,11 +26,29 @@ public class UserService {
     private UserRepository repository;
     private RestaurantService restaurantService;
     private OrderService orderService;
+    private CommentService commentService;
 
-    public UserService(UserRepository repository, RestaurantService restaurantService, OrderService orderService) {
+    public UserService(UserRepository repository, RestaurantService restaurantService, OrderService orderService, CommentService commentService) {
         this.repository = repository;
         this.restaurantService = restaurantService;
         this.orderService = orderService;
+        this.commentService = commentService;
+    }
+
+    public boolean addComment(Regular r, CommentRequest req, String restName) {
+        if(!orderService.hasDeliveredOrder(r.getUsername(), restName)) {
+            return false;
+        }
+        Optional<Restaurant> rest = restaurantService.getByName(restName);
+        if(!rest.isPresent()) {
+            return false;
+        }
+
+        return commentService.create(r.getUsername(), restName, req.getBody(), req.getRating(), r.getProfileImg());
+    }
+
+    public boolean approveComment(Integer id) {
+        return commentService.approve(id);
     }
 
     public Optional<String> login(LoginRequest req) {

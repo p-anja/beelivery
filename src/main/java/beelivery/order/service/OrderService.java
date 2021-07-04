@@ -37,6 +37,11 @@ public class OrderService {
         return repository.update(o);
     }
 
+    public boolean hasDeliveredOrder(String username, String restName) {
+        return repository.getAll().stream().filter(o -> o.getUsername().equals(username)
+            && o.getStatus().equals(EOrderStatus.DELIVERED) && o.getRestaurant().getName().equals(restName)).findFirst().isPresent();
+    }
+
     public double cancel(String id) {
         Optional<Order> order = repository.get(id);
         if(!order.isPresent()) {
