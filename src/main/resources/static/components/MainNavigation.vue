@@ -4,6 +4,7 @@
 			<div id="nav" :class="{sticky:active}">
 				<div class="nav-container" :class="toggleNavClass()">
 					<div class="navbar-item logo">
+						<img src="img/beelogo.svg" alt="bee" width="32px" height="32px">
 						<router-link id="logo" to="/">beelivery</router-link>
 					</div>
 					<div id="search">
