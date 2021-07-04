@@ -1,6 +1,7 @@
 package beelivery.user.controller;
 
 import beelivery.misc.JwtUtil;
+import beelivery.order.model.Order;
 import beelivery.order.service.OrderService;
 import beelivery.user.dto.*;
 import beelivery.user.model.ERole;
@@ -10,8 +11,12 @@ import beelivery.user.service.UserService;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static beelivery.Application.gson;
 import static beelivery.misc.Responses.*;
@@ -133,7 +138,54 @@ public class UserController {
                 if(!u.isPresent()) {
                     return forbidden(res);
                 }
-                return gson.toJson(service.getUserOrders(u.get().getUsername()));
+
+                String restName = req.queryParams("rest");
+                String priceFrom = req.queryParams("pricefrom");
+                String priceTo = req.queryParams("priceto");
+                String dateFrom = req.queryParams("datefrom");
+                String dateTo = req.queryParams("dateto");
+
+                List<Order> orders = service.getUserOrders(u.get());
+
+                if(restName != null && !restName.isBlank()) {
+                    orders = orders.stream().filter(o -> o.getRestaurant().getName().toLowerCase()
+                            .contains(restName.toLowerCase()))
+                        .collect(Collectors.toList());
+                }
+
+                if(priceFrom != null && !priceFrom.isBlank()) {
+                    final double price = Double.parseDouble(priceFrom);
+                    orders = orders.stream().filter(o -> o.getPrice() >= price).collect(Collectors.toList());
+                }
+
+                if(priceTo != null && !priceTo.isBlank()) {
+                    final double price = Double.parseDouble(priceTo);
+                    orders = orders.stream().filter(o -> o.getPrice() <= price).collect(Collectors.toList());
+                }
+
+                if(dateFrom != null && !dateFrom.isBlank()) {
+                    final LocalDate date = LocalDate.parse(dateFrom, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    orders = orders.stream().filter(o -> {
+                        LocalDate oDate = o.getDate().toLocalDate();
+                        if(oDate.compareTo(date) >= 0) {
+                            return true;
+                        }
+                        return false;
+                    }).collect(Collectors.toList());
+                }
+
+                if(dateTo != null && !dateTo.isBlank()) {
+                    final LocalDate date = LocalDate.parse(dateFrom, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    orders = orders.stream().filter(o -> {
+                        LocalDate oDate = o.getDate().toLocalDate();
+                        if(oDate.compareTo(date) <= 0) {
+                            return true;
+                        }
+                        return false;
+                    }).collect(Collectors.toList());
+                }
+
+                return gson.toJson(orders);
             } catch (Exception e) {
                 e.printStackTrace();
                 return internal(res);

@@ -3,6 +3,7 @@ package beelivery;
 import static spark.Spark.*;
 
 import beelivery.misc.ImageController;
+import beelivery.misc.LocalDateTimeDeserializer;
 import beelivery.misc.LocalDateTimeSerializer;
 import beelivery.misc.RuntimeTypeAdapterFactory;
 import beelivery.order.repository.OrderRepository;
@@ -27,6 +28,8 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Application {
 
@@ -48,6 +51,7 @@ public class Application {
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(userAdapterFactory)
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
         port(8080);
         staticFiles.location("/static");

@@ -15,8 +15,11 @@ public class OrderRepository extends JSONRepository<Order, String> {
     }
 
     public String getNextId() {
-        byte[] buffer = new byte[10];
-        new Random().nextBytes(buffer);
-        return new String(buffer, Charset.forName("UTF-8"));
+        int len = 10;
+        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        StringBuilder sb = new StringBuilder(len);
+        for(int i = 0; i < len; i++)
+            sb.append(AB.charAt(new Random().nextInt(AB.length())));
+        return sb.toString();
     }
 }

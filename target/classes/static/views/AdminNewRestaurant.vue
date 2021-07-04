@@ -228,7 +228,7 @@ module.exports = {
             };
 
             axios.post('/admin/restaurant', data, config)
-                .then(() => this.router.go(0))
+                .then(() => this.$router.go(0))
                 .catch(r => console.log(r));
         },
 

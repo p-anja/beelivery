@@ -21,6 +21,7 @@ public class Order implements IIdentifiable<String> {
     private String lastName;
     private EOrderStatus status;
     private boolean deleted;
+    private String deliveryUsername;
 
     public Order(String id, Restaurant restaurant, LocalDateTime date, double price, String username, String firstName, String lastName, EOrderStatus status) {
         this.id = id;
@@ -57,6 +58,14 @@ public class Order implements IIdentifiable<String> {
         this.articles = new ArrayList<Article>();
         this.deleted = false;
         this.status = EOrderStatus.PENDING;
+    }
+
+    public String getDeliveryUsername() {
+        return deliveryUsername;
+    }
+
+    public void setDeliveryUsername(String deliveryUsername) {
+        this.deliveryUsername = deliveryUsername;
     }
 
     public void addArticle(Article a) {

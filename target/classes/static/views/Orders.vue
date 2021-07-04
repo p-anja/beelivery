@@ -1,26 +1,25 @@
 <template>
     <div>
         <main-navigation>
-            <router-link to="/">Home</router-link>
         </main-navigation>
         <div id="cart-main">
             <div id="search-container">
-                <input type="text" placeholder="Restaurant">
+                <input type="text" placeholder="Restaurant" v-model="restaurantName" @keydown.enter="getOrders">
                 <div id="sort-container">
                     <p @click="sort('restaurant.name')">Restaurant<span v-if="sortBy == 'restaurant.name'" v-html="sortSymbol"></span></p>
                     <p @click="sort('date')">Date<span v-if="sortBy == 'date'" v-html="sortSymbol"></span></p>
                     <p @click="sort('price')">Price<span v-if="sortBy == 'price'" v-html="sortSymbol"></span></p>
                 </div>
                 <div id="filters-container">
-                    <input type="number" min="0" v-model="fromPrice" placeholder="Min price">
-                    <input type="number" min="0" v-model="toPrice" placeholder="Max price">
+                    <input type="number" min="0" v-model="fromPrice" placeholder="Min price" @keydown.enter="getOrders">
+                    <input type="number" min="0" v-model="toPrice" placeholder="Max price" @keydown.enter="getOrders">
                     <div class="filter-item">
                         <label>From date:</label>
-                        <input type="date" v-model="fromDate">
+                        <input type="date" v-model="fromDate" @keydown.enter="getOrders">
                     </div>
                     <div class="filter-item">
                         <label>To date:</label>
-                        <input type="date" v-model="toDate">
+                        <input type="date" v-model="toDate" @keydown.enter="getOrders">
                     </div>
                     <select v-model="selectedType">
                         <option value="">Select type</option>
@@ -42,16 +41,16 @@
                         <h3>{{result.id}}</h3>
                         <p>{{result.date}}</p>
                         <b>{{result.status}}</b>
-                        <p>{{result.restaurant.name}} ({{result.restaurant.type}})</p>
-                        <p>{{result.address.street}} {{result.address.streetNo}}</p>
-                        <p>{{result.address.city}}, {{result.address.state}}</p>
+                        <p>{{result.restaurant.name}} ({{result.restaurant.restType}})</p>
+                        <p>{{result.restaurant.address.street}} {{result.restaurant.address.streetNo}}</p>
+                        <p>{{result.restaurant.address.city}}, {{result.restaurant.address.state}}</p>
                     </div>
                     <div class="result-action">
                         <b>{{result.price}} &#8364;</b>
                         <div class="spacer"></div>
-                        <button class="button-cancel" v-if="user.role=='USER' && result.status=='Pending'">Cancel</button>
-                        <button class="button-primary" v-else-if="user.role=='DELIVERY' && result.status=='Waiting delivery'">Request</button>
-                        <button class="button-delivered" v-else-if="user.role=='DELIVERY' && result.status=='In transit'">Delivered</button>
+                        <button class="button-cancel" v-if="role=='USER' && result.status=='PENDING'">Cancel</button>
+                        <button class="button-primary" v-else-if="role=='DELIVERY' && result.status=='WAITING'">Request</button>
+                        <button class="button-delivered" v-else-if="role=='DELIVERY' && result.status=='TRANSPORT'">Delivered</button>
                     </div>
                 </div>
             </div>
@@ -62,9 +61,7 @@
 <script>
 module.exports = {
     data: () => ({
-        user: {
-            role: "DELIVERY",
-        },
+        role: 'DELIVERY',
 
         sortBy: 'restaurant.name',
         sortDirection: 'asc',
@@ -144,9 +141,39 @@ module.exports = {
         toDate: '',
         fromPrice: '',
         toPrice: '',
+        restaurantName: '',
     }),
 
     methods: {
+        getRole: function() {
+            if(!localStorage.jws) {
+                return;
+            }
+            axios.get('/user/role', {headers:{'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(r => this.role = r.data);
+        },
+
+        getOrders: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            let priceFrom = this.fromPrice ? '&pricefrom=' + this.fromPrice : '';
+            let priceTo = this.toPrice ? '&priceto=' + this.toPrice : '';
+            let dateFrom = this.fromDate ? '&datefrom=' + this.fromDate : '';
+            let dateTo = this.toDate ? '&dateto=' + this.toDate : '';
+
+            let query = '?rest=' + this.restaurantName + priceFrom + priceTo + dateFrom + dateTo;
+
+            axios.get('/user/order' + query, {headers:{'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(r => {
+                    console.log(r.data);
+                    this.results = r.data;
+                })
+                .catch(r => console.log(r));
+        },
+
         sort: function(s) {
             if(this.sortBy == s) {
                 this.sortDirection = this.sortDirection == 'asc' ? 'desc' : 'asc';
@@ -174,19 +201,24 @@ module.exports = {
                 return 0;
             });
             if(this.selectedType) {
-                res = res.filter(r => r.restaurant.type == this.selectedType);
+                res = res.filter(r => r.restaurant.restType == this.selectedType);
             }
             if(this.selectedStatus) {
                 res = res.filter(r => r.status == this.selectedStatus);
             }
             if(this.undelivered) {
-                res = res.filter(r => r.status != 'Delivered');
+                res = res.filter(r => r.status != 'DELIVERED');
             }
             return res;
         },
         sortSymbol: function() {
             return this.sortDirection=='asc' ? '&#x25B2;' : '&#x25BC;'
         },
+    },
+
+    mounted() {
+        this.getRole();
+        this.getOrders();
     },
 };
 </script>

@@ -23,11 +23,25 @@ public class OrderService {
         String id = repository.getNextId();
         order.setId(id);
         order.setArticles(cart.getArticles());
+        repository.create(order);
         return id;
     }
 
     public List<Order> getByUsername(String username) {
-        return repository.getAll().stream().filter(o -> o.getUsername().equals(username))
+        List<Order> all = repository.getAll();
+        return all.stream().filter(o -> o.getUsername().equals(username))
+            .collect(Collectors.toList());
+    }
+
+    public List<Order> getByManagerUsername(String username) {
+        return repository.getAll().stream()
+            .filter(o -> o.getRestaurant().getManagerUsername().equals(username))
+            .collect(Collectors.toList());
+    }
+
+    public List<Order> getByDeliveryUsername(String username) {
+        return repository.getAll().stream()
+            .filter(o -> o.getDeliveryUsername() != null && o.getDeliveryUsername().equals(username))
             .collect(Collectors.toList());
     }
 }

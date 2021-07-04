@@ -13,6 +13,7 @@ import beelivery.user.model.*;
 import beelivery.user.repository.UserRepository;
 import spark.Request;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -100,8 +101,22 @@ public class UserService {
         return repository.update(r);
     }
 
-    public List<Order> getUserOrders(String username) {
-        return orderService.getByUsername(username);
+    public List<Order> getUserOrders(User user) {
+        switch (user.getRole()) {
+            case REGULAR: {
+                return orderService.getByUsername(user.getUsername());
+            }
+
+            case MANAGER: {
+                return orderService.getByManagerUsername(user.getUsername());
+            }
+
+            case DELIVERY: {
+                return orderService.getByDeliveryUsername(user.getUsername());
+            }
+            // ADMIN ?
+        }
+        return Collections.emptyList();
     }
 
     public boolean addToCart(Regular r, List<CartItemRequest> itemsReq, String restName) {
