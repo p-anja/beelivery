@@ -33,6 +33,25 @@ public class AdminController {
         this.service = service;
         this.restaurantService = restaurantService;
 
+        delete("/admin/user/:username", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String username = req.params(":username");
+                if(username == null || username.isBlank()) {
+                    return badRequest("Bad username", res);
+                }
+                return service.deleteUser(username)
+                    ? ok("Deleted", res)
+                    : badRequest("Not deleted", res);
+            } catch(Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
         delete("/admin/comment/:id", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req, ERole.ADMIN);

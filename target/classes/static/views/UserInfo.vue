@@ -198,6 +198,7 @@ module.exports = {
     }
 
     #userinfo-profile img {
+        cursor: pointer;
         width: 128px;
         height: 128px;
         margin-bottom: 20px;

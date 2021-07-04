@@ -35,6 +35,10 @@ public class UserService {
         this.commentService = commentService;
     }
 
+    public boolean deleteUser(String username) {
+        return repository.delete(username);
+    }
+
     public boolean addComment(Regular r, CommentRequest req, String restName) {
         if(!orderService.hasDeliveredOrder(r.getUsername(), restName)) {
             return false;
@@ -266,7 +270,7 @@ public class UserService {
     }
 
     public List<User> search(String username, String fname, String lname) {
-        List<User> res = getAll();
+        List<User> res = getAll().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList());
         if(!username.isBlank()) {
             res = res.stream().filter(u -> u.getUsername().toLowerCase().contains(username.toLowerCase()))
                     .collect(Collectors.toList());

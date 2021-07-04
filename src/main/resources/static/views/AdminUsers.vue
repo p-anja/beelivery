@@ -35,6 +35,13 @@
                         <b v-if="user.memberType" :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
                         <span>Points: {{user.points}}</span>
                     </div>
+                    <div class="spacer"></div>
+                    <div class="user-profile">
+                        <img v-if="user.profileImg" :src="'http://localhost:8080/image/' + user.profileImg">
+                        <img v-else src="img/profile_placeholder.png" alt="profile">
+                        <div class="spacer"></div>
+                        <button v-if="user.role != 'ADMIN'" class="button-delete" @click="deleteUser(user.username)">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,6 +91,16 @@ module.exports = {
     },
 
     methods: {
+        deleteUser: function(username) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            axios.delete('/admin/user/' + username, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => this.getUsers())
+                .catch(r => console.log(r));
+        },
         search: function() {
             clearTimeout(this.timeout);
             this.results = [];
@@ -180,7 +197,7 @@ module.exports = {
 
     .user-card {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         padding: 10px;
         border: solid 1px #eee;
     }
@@ -242,4 +259,19 @@ module.exports = {
         color: #ffd700;
     }
     
+    .user-profile {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-profile img {
+        width: 128px;
+        height: 128px;
+    }
+
+    .button-delete {
+        color: #fff;
+        background-color: #e74c3c;
+    }
+
 </style>
