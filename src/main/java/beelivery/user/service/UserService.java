@@ -47,8 +47,24 @@ public class UserService {
         return commentService.create(r.getUsername(), restName, req.getBody(), req.getRating(), r.getProfileImg());
     }
 
-    public boolean approveComment(Integer id) {
-        return commentService.approve(id);
+    public boolean approveComment(Manager m, Integer id) {
+        double newAvg = commentService.approve(id, m.getRestaurant().getName());
+        if(newAvg < 0) {
+            return false;
+        }
+        m.getRestaurant().setAvgScore(newAvg);
+        Optional<Restaurant> r = restaurantService.getByName(m.getRestaurant().getName());
+        r.get().setAvgScore(newAvg);
+
+        return updateUser(m) && restaurantService.update(r.get());
+    }
+
+    public boolean declineComment(Integer id) {
+        return commentService.decline(id);
+    }
+
+    public boolean deleteComment(Integer id) {
+        return commentService.delete(id);
     }
 
     public Optional<String> login(LoginRequest req) {

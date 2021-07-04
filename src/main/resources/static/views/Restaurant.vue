@@ -132,12 +132,11 @@
                                             <div class="spacer"></div>
                                             <img :src="'http://localhost:8080/image/' + comment.userProfile" alt="commenter pic">
                                         </div>
-                                        <div v-if="(isManager || isAdmin) && comment.status == 'PENDING'" class="comment-actions">
-                                            <button class="button-approve" v-if="isManager" @click="approveComment(comment.id)">Approve</button>
+                                        <div v-if="(isManager || isAdmin)" class="comment-actions">
+                                            <button class="button-approve" v-if="isManager && comment.status == 'PENDING'" @click="approveComment(comment.id)">Approve</button>
                                             <div class="spacer"></div>
-                                            <b :class="articleSuccess ? 'success' : 'error'">{{errors.article}}</b>
-                                            <button class="button-deny" v-if="isManager" >Deny</button>
-                                            <button class="button-deny" v-if="isAdmin">Delete</button>
+                                            <button class="button-deny" v-if="isManager && comment.status == 'PENDING'" @click="declineComment(comment.id)">Deny</button>
+                                            <button class="button-deny" v-if="isAdmin" @click="deleteComment(comment.id)">Delete</button>
                                         </div>
                                     </div>
                                 </div>
@@ -250,7 +249,7 @@ module.exports = {
                 return;
             }
 
-            axios.delete('/admin/' + this.$route.params.name + '/comment/' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+            axios.delete('/admin/comment/' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
                 .then(() => this.$router.go(0))
                 .catch(r => console.log(r));
         },

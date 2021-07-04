@@ -119,9 +119,28 @@ public class ManagerController {
                     return badRequest("Invalid comment", res);
                 }
                 Integer id = Integer.parseInt(idstr);
-                return service.approveComment(id)
-                    ? ok("Approved", res)
-                    : badRequest("Not approved", res);
+                return service.approveComment((Manager) u.get(), id)
+                        ? ok("Approved", res)
+                        : badRequest("Not approved", res);
+            } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
+        post("/manager/comment/decline", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String idstr = req.body();
+                if(idstr == null || idstr.isBlank()) {
+                    return badRequest("Invalid comment", res);
+                }
+                Integer id = Integer.parseInt(idstr);
+                return service.declineComment(id)
+                        ? ok("Declined", res)
+                        : badRequest("Not declined", res);
             } catch (Exception e) {
                 return internal(res);
             }

@@ -23,8 +23,7 @@ import java.util.Optional;
 
 import static beelivery.Application.gson;
 import static beelivery.misc.Responses.*;
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class AdminController {
     private UserService service;
@@ -33,6 +32,28 @@ public class AdminController {
     public AdminController(UserService service, RestaurantService restaurantService) {
         this.service = service;
         this.restaurantService = restaurantService;
+
+        delete("/admin/comment/:id", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String idstr = req.params(":id");
+                if(idstr == null || idstr.isBlank()) {
+                    return badRequest("Not deleted", res);
+                }
+
+                Integer id = Integer.parseInt(idstr);
+
+                return service.deleteComment(id)
+                    ? ok("Deleted", res)
+                    : badRequest("Not deleted", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
 
         post("/admin/restaurant", (req, res) -> {
             try {

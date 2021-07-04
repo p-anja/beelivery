@@ -22,6 +22,10 @@ public class RestaurantService {
         this.repository = repository;
     }
 
+    public boolean update(Restaurant r) {
+        return repository.update(r);
+    }
+
     public boolean addArticleToRestaurant(Manager m, ArticleRequest req) {
         Restaurant r = m.getRestaurant();
         if(r == null) {

@@ -29,15 +29,40 @@ public class CommentService {
 
     public List<Comment> getOwnerComments(String name) {
         return repository.getAll().stream().filter(c -> c.getRestaurantName().equals(name)
-            && !c.getStatus().equals(ECommentStatus.APPROVED)).collect(Collectors.toList());
+            && !c.getStatus().equals(ECommentStatus.APPROVED)
+            && !c.isDeleted()).collect(Collectors.toList());
     }
 
-    public boolean approve(Integer id) {
+    public double approve(Integer id, String name) {
+        Optional<Comment> c = repository.get(id);
+        if(!c.isPresent()) {
+            return -1.0;
+        }
+        c.get().setStatus(ECommentStatus.APPROVED);
+        if (!repository.update(c.get())) {
+            return -1.0;
+        }
+
+        double newAvg = 0.0;
+        int count = 0;
+        for(Comment co : getByRestaurantName(name)) {
+            newAvg += co.getRating();
+            ++count;
+        }
+
+        return newAvg / count;
+    }
+
+    public boolean decline(Integer id) {
         Optional<Comment> c = repository.get(id);
         if(!c.isPresent()) {
             return false;
         }
-        c.get().setStatus(ECommentStatus.APPROVED);
+        c.get().setStatus(ECommentStatus.DENIED);
         return repository.update(c.get());
+    }
+
+    public boolean delete(Integer id) {
+        return repository.delete(id);
     }
 }
