@@ -1,5 +1,6 @@
 package beelivery.user.controller;
 
+import beelivery.Application;
 import beelivery.comment.CommentService;
 import beelivery.comment.dto.CommentRequest;
 import beelivery.misc.JwtUtil;
@@ -12,10 +13,18 @@ import beelivery.user.model.User;
 import beelivery.user.service.UserService;
 import com.google.gson.reflect.TypeToken;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,6 +77,34 @@ public class UserController {
                         ? ok("Deleted", res)
                         : badRequest("Not deleted", res);
             } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
+        post("/user/profile", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+                String location = "image";
+                long maxFileSize = 100000000;
+                long maxRequestSize = 100000000;
+                int fileSizeThreshold = 1024;
+                MultipartConfigElement mce = new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold);
+                req.raw().setAttribute("org.eclipse.jetty.multipartConfig", mce);
+                Collection<Part> parts = req.raw().getParts();
+                String fname = req.raw().getPart("file").getSubmittedFileName();
+                Path out = Paths.get(Application.UPLOAD_DIR + File.separator + fname);
+                try (final InputStream in = req.raw().getPart("file").getInputStream()) {
+                    if(!Files.exists(out))
+                        Files.copy(in, out);
+                }
+                u.get().setProfileImg(fname);
+                return service.updateUser(u.get())
+                    ? ok("Updated", res)
+                    : badRequest("Not updated", res);
+            } catch(Exception e) {
                 return internal(res);
             }
         });

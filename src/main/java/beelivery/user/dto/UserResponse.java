@@ -13,14 +13,16 @@ public class UserResponse {
     protected String lastName;
     protected String sex;
     protected String birthDate;
+    protected String profileImg;
 
-    public UserResponse(String username, String password, String firstName, String lastName, String sex, String birthDate) {
+    public UserResponse(String username, String password, String firstName, String lastName, String sex, String birthDate, String profileImg) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.sex = sex;
         this.birthDate = birthDate;
+        this.profileImg = profileImg;
     }
 
     public UserResponse(User user) {
@@ -31,6 +33,15 @@ public class UserResponse {
         this.sex = user.getSex().name();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         this.birthDate = format.format(user.getBirthDate());
+        this.profileImg = user.getProfileImg();
+    }
+
+    public String getProfileImg() {
+        return profileImg;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
     }
 
     public String getUsername() {

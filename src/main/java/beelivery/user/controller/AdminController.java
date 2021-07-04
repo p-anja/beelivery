@@ -72,7 +72,8 @@ public class AdminController {
                 String fname = req.raw().getPart("file").getSubmittedFileName();
                 Path out = Paths.get(Application.UPLOAD_DIR + File.separator + fname);
                 try (final InputStream in = req.raw().getPart("file").getInputStream()) {
-                    Files.copy(in, out);
+                    if(!Files.exists(out))
+                        Files.copy(in, out);
                 }
                 RestaurantRequest restReq = gson.fromJson(req.raw().getParameter("request"), RestaurantRequest.class);
                 Optional<Restaurant> r = restaurantService.create(restReq, fname);

@@ -5,7 +5,11 @@
         <div id="userinfo-main">
             <div id="userinfo-container">
                 <div id="userinfo-profile">
-                    <img src="img/profile_placeholder.png" alt="profile">
+                    <input type="file" ref="file" @change="updateProfile" style="display: none">
+                    <div v-if="!user.profileImg" class="profile-placeholder" @click="$refs.file.click()">
+                        +
+                    </div>
+                    <img @click="$refs.file.click()" v-else :src="'http://localhost:8080/image/' + user.profileImg" alt="profile">
                     <b v-if="user.memberType">{{user.memberType}}</b>
                     <b v-if="user.points != null">Points: {{user.points}}</b>
                 </div>
@@ -87,6 +91,24 @@ module.exports = {
     },
 
     methods: {
+        updateProfile: function() {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            let file = this.$refs.file.files[0];
+            let data = new FormData();
+            data.append('file', file);
+            let config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + localStorage.jws,
+                }
+            };
+            axios.post('/user/profile', data, config)
+                .then(() => this.$router.go(0))
+                .catch(r => console.log(r));
+        },
         getUser: function() {
             if(!localStorage.jws) {
                 this.$router.push('/');
@@ -176,6 +198,7 @@ module.exports = {
     }
 
     #userinfo-profile img {
+        cursor: pointer;
         width: 128px;
         height: 128px;
         margin-bottom: 20px;
@@ -202,5 +225,16 @@ module.exports = {
     .form-field {
         display: flex;
         flex-direction: column;
+    }
+
+    .profile-placeholder {
+        display: grid;
+        place-items: center;
+        font-weight: 500;
+        font-size: 5rem;
+        width: 128px;
+        height: 128px;
+        cursor: pointer;
+        background: #eee;
     }
 </style>

@@ -163,7 +163,8 @@ public class ManagerController {
                 String fname = req.raw().getPart("file").getSubmittedFileName();
                 Path out = Paths.get(Application.UPLOAD_DIR + File.separator + fname);
                 try (final InputStream in = req.raw().getPart("file").getInputStream()) {
-                    Files.copy(in, out);
+                    if(!Files.exists(out))
+                        Files.copy(in, out);
                 }
                 ArticleRequest areq = gson.fromJson(req.raw().getParameter("request"), ArticleRequest.class);
                 areq.setImageFilepath(fname);

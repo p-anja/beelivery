@@ -7,8 +7,8 @@ public class RegularResponse extends UserResponse {
     private double points;
     private String memberType;
 
-    public RegularResponse(String username, String password, String firstName, String lastName, String sex, String birthDate, double points, String memberType) {
-        super(username, password, firstName, lastName, sex, birthDate);
+    public RegularResponse(String username, String password, String firstName, String lastName, String sex, String birthDate, double points, String memberType, String profileImg) {
+        super(username, password, firstName, lastName, sex, birthDate, profileImg);
         this.points = points;
         this.memberType = memberType;
     }
