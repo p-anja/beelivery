@@ -82,6 +82,22 @@ public class AdminController {
             }
         });
 
+        post("/admin/delivery", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.ADMIN);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                return service.registerDelivery(gson.fromJson(req.body(), RegisterRequest.class))
+                    ? ok("Registered delivery", res)
+                    : badRequest("Failed to register delivery person", res);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return internal(res);
+            }
+        });
+
         get("/admin/managers", (req, res) -> {
             try {
                 if(!service.validateJWS(req, ERole.ADMIN).isPresent()) {

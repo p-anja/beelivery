@@ -7,6 +7,7 @@
                 <sidebar title="Admin panel">
                     <router-link to="/admin">Users</router-link>
                     <router-link to="/admin/newrestaurant">New restaurant</router-link>
+                    <router-link to="/admin/newuser">New user</router-link>
                 </sidebar>
                 <div id="admin-view">
                     <router-view></router-view>

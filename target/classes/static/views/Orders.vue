@@ -131,8 +131,8 @@ module.exports = {
                 },
             },
         ],
-        types: ['Chinese', 'Pizzeria', 'Italian',],
-        statuses: ['Pending', 'Preparation', 'Waiting delivery', 'In transit', 'Delivered', 'Canceled'],
+        types: ['ITALIAN', 'CHINESE', 'BARBEQUE', 'PIZZERIA',],
+        statuses: ['PENDING', 'PREPARING', 'WAITING', 'TRANSPORT', 'DELIVERED', 'CANCELED',],
 
         undelivered: false,
         selectedStatus: '',

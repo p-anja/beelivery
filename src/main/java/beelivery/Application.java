@@ -14,10 +14,7 @@ import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.controller.AdminController;
 import beelivery.user.controller.ManagerController;
 import beelivery.user.controller.UserController;
-import beelivery.user.model.Admin;
-import beelivery.user.model.Manager;
-import beelivery.user.model.Regular;
-import beelivery.user.model.User;
+import beelivery.user.model.*;
 import beelivery.user.repository.UserRepository;
 import beelivery.user.service.UserService;
 import com.google.gson.GsonBuilder;
@@ -46,7 +43,8 @@ public class Application {
         RuntimeTypeAdapterFactory<User> userAdapterFactory = RuntimeTypeAdapterFactory.of(User.class)
                 .registerSubtype(Regular.class)
                 .registerSubtype(Admin.class)
-                .registerSubtype(Manager.class);
+                .registerSubtype(Manager.class)
+                .registerSubtype(Delivery.class);
 
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(userAdapterFactory)

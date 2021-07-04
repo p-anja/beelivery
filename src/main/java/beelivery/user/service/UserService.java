@@ -162,6 +162,14 @@ public class UserService {
         return repository.create(manager);
     }
 
+    public boolean registerDelivery(RegisterRequest req) {
+        if(getByUsername(req.getUsername()).isPresent()) {
+            return false;
+        }
+        Delivery delivery = new Delivery(req.getUsername(), req.getPassword(), req.getFirstName(), req.getLastName(), req.getSex(), req.getBirthDate());
+        return repository.create(delivery);
+    }
+
     public Optional<User> getByUsername(String username) {
         return repository.get(username);
     }

@@ -52,13 +52,10 @@
                     </div>
                     <div class="spacer"></div>
                     <b class="error">{{errors.restaurant}}</b>
+                    <b class="success">{{successMsgRestaurant}}</b>
                     <button class="button-primary" @click="addRestaurant">Add restaurant</button>
                 </form>
-                <div v-if="registeredManager" id="newmanager-form-success">
-                    <h4>Registered!</h4>
-                    <p><i class="fa fa-check-circle-o" aria-hidden="true"></i></p>
-                </div>
-                <form v-else id="newmanager-form" @submit.prevent :class="selectedManager != 'New' ? 'disabled' : ''">
+                <form id="newmanager-form" @submit.prevent :class="selectedManager != 'New' ? 'disabled' : ''">
                     <h4>New manager</h4>
                     <b class="error">{{errors.username}}</b>
                     <input v-model="username" type="text" placeholder="Username" :disabled="selectedManager != 'New'">
@@ -78,6 +75,7 @@
                     <input type="date" v-model="birthDate" :max="new Date()"/>
                     <div class="spacer"></div>
                     <b class="error">{{errors.registerManager}}</b>
+                    <b class="success">{{successMsgManager}}</b>
                     <button 
                     :class="selectedManager != 'New' ? 'disabled-btn' : 'button-primary'"
                     :disabled="selectedManager != 'New'"
@@ -96,7 +94,8 @@ module.exports = {
             selectedType: '',
             managers: [],
             selectedManager: '',
-            registeredManager: false,
+            successMsgManager: '',
+            successMsgRestaurant: '',
             selectedLocation: false,
             state: '',
             city: '',
@@ -169,6 +168,8 @@ module.exports = {
             this.errors.lastName = lastNameValid ? '' : 'Last name required';
             this.errors.birthDate = birthDateValid ? '' : 'Select date before today';
             this.errors.registerManager = '';
+            this.successMsgManager = '';
+            this.successMsgRestaurant = '';
 
             return usernameValid && passwordValid
                 && firstNameValid && lastNameValid
@@ -228,12 +229,14 @@ module.exports = {
             };
 
             axios.post('/admin/restaurant', data, config)
-                .then(() => this.$router.go(0))
+                .then(() => {
+                    this.successMsgRestaurant = "Added restaurant";
+                    this.$router.go(0);
+                })
                 .catch(r => console.log(r));
         },
 
         registerManager: function() {
-            this.registeredManager = false;
             if(!this.validateManagerInputs()) {
                 return;
             }
@@ -253,7 +256,7 @@ module.exports = {
             axios.post('/admin/manager', registerRequest, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
                 .then(() => {
                     this.getManagers();
-                    this.registeredManager = true;
+                    this.successMsgManager = 'Registered manager';
                 })
                 .catch(() => this.errors.registerManager = 'Failed to register manager');
         },
