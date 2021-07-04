@@ -127,7 +127,32 @@ public class UserService {
         }
         Manager m = (Manager) u.get();
         m.addRequest(new DeliveryRequest(orderId, d.getUsername()));
-        return true;
+        return updateUser(m);
+    }
+
+    public boolean approveOrder(Manager m, DeliveryRequest req) {
+        Optional<Order> o = orderService.get(req.getOrderId());
+        if(!o.isPresent() || !o.get().getStatus().equals(EOrderStatus.WAITING)) {
+            return false;
+        }
+        Optional<User> u = getByUsername(req.getUsername());
+        if(!u.isPresent()) {
+            return false;
+        }
+        Delivery d = (Delivery) u.get();
+        o.get().setStatus(EOrderStatus.TRANSPORT);
+        o.get().setDeliveryUsername(d.getUsername());
+        d.addOrder(o.get().getId());
+        m.removeRequest(req);
+        return updateUser(m) && updateUser(d) && orderService.update(o.get());
+    }
+
+    public boolean declineRequest(Manager m, DeliveryRequest req) {
+        Optional<User> u = getByUsername(req.getUsername());
+        if(!u.isPresent()) {
+            return false;
+        }
+        return m.removeRequest(req) && updateUser(m);
     }
 
     public List<Order> getUserOrders(User user) {

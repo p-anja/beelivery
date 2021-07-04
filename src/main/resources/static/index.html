@@ -138,13 +138,18 @@
             },
             {
                 path: '/manager',
-                component: httpVueLoader('../views/Manager.vue'),
+                component: httpVueLoader('views/Manager.vue'),
                 children: [
-                {
-                    path: '',
-                    name: 'ManagerRestaurant',
-                    component: httpVueLoader('../views/ManagerRestaurant.vue'),
-                }
+                    {
+                        path: '',
+                        name: 'ManagerRestaurant',
+                        component: httpVueLoader('views/ManagerRestaurant.vue'),
+                    },
+                    {
+                        path: 'requests',
+                        name: 'ManagerRequests',
+                        component: httpVueLoader('views/ManagerRequests.vue'),
+                    },
                 ],
             },
         ];  

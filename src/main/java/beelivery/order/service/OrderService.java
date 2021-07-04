@@ -33,6 +33,10 @@ public class OrderService {
         return repository.get(id);
     }
 
+    public boolean update(Order o) {
+        return repository.update(o);
+    }
+
     public double cancel(String id) {
         Optional<Order> order = repository.get(id);
         if(!order.isPresent()) {

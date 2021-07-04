@@ -16,13 +16,13 @@ public class Manager extends User{
     }
 
     public void addRequest(DeliveryRequest r) {
-        if(!requests.contains(r)) {
+        if(!requests.stream().filter(re -> re.getUsername().equals(r.getUsername()) && re.getOrderId().equals(r.getOrderId())).findFirst().isPresent()) {
             requests.add(r);
         }
     }
 
     public boolean removeRequest(DeliveryRequest r) {
-        return requests.remove(r);
+        return requests.removeIf(re -> re.getOrderId().equals(r.getOrderId()) && re.getUsername().equals(r.getUsername()));
     }
 
     public Restaurant getRestaurant() {

@@ -5,6 +5,7 @@ import beelivery.order.service.OrderService;
 import beelivery.restaurant.dto.ManagerRestaurantResponse;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.dto.ArticleRequest;
+import beelivery.user.model.DeliveryRequest;
 import beelivery.user.model.ERole;
 import beelivery.user.model.Manager;
 import beelivery.user.model.User;
@@ -50,6 +51,23 @@ public class ManagerController {
                     ? ok("Deleted", res)
                     : badRequest("Not deleted", res);
             } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
+        put("/manager/requests", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                DeliveryRequest dReq = gson.fromJson(req.body(), DeliveryRequest.class);
+
+                return service.declineRequest((Manager) u.get(), dReq)
+                    ? ok("Declined", res)
+                    : badRequest("Not declined", res);
+            } catch(Exception e) {
                 return internal(res);
             }
         });
@@ -120,6 +138,34 @@ public class ManagerController {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                return internal(res);
+            }
+        });
+
+        post("/manager/requests", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if (!u.isPresent()) {
+                    return forbidden(res);
+                }
+                DeliveryRequest dReq = gson.fromJson(req.body(), DeliveryRequest.class);
+                return service.approveOrder((Manager) u.get(), dReq)
+                    ? ok("Approved", res)
+                    : badRequest("Not approved", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
+        get("/manager/requests", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if (!u.isPresent()) {
+                    return forbidden(res);
+                }
+                Manager m = (Manager) u.get();
+                return gson.toJson(m.getRequests());
+            } catch(Exception e) {
                 return internal(res);
             }
         });
