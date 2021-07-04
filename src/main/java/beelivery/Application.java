@@ -12,6 +12,7 @@ import beelivery.restaurant.controller.RestaurantController;
 import beelivery.restaurant.repository.RestaurantRepository;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.controller.AdminController;
+import beelivery.user.controller.DeliveryController;
 import beelivery.user.controller.ManagerController;
 import beelivery.user.controller.UserController;
 import beelivery.user.model.*;
@@ -68,8 +69,9 @@ public class Application {
         UserService userService = new UserService(userRepository, restaurantService, orderService);
         UserController userController = new UserController(userService);
 
-        ManagerController managerController = new ManagerController(userService, restaurantService);
+        ManagerController managerController = new ManagerController(userService, restaurantService, orderService);
         AdminController adminController = new AdminController(userService, restaurantService);
+        DeliveryController deliveryController = new DeliveryController(userService, orderService);
 
     }
 }

@@ -27,6 +27,14 @@ public class Regular extends User {
         this.orders = new ArrayList<String>();
     }
 
+    public void addPoints(double pts) {
+        points += pts;
+    }
+
+    public void subtractPoints(double pts) {
+        points -= pts;
+    }
+
     public void addOrder(String orderId) {
         if(!orders.contains(orderId)) {
             orders.add(orderId);

@@ -48,9 +48,10 @@
                     <div class="result-action">
                         <b>{{result.price}} &#8364;</b>
                         <div class="spacer"></div>
-                        <button class="button-cancel" v-if="role=='USER' && result.status=='PENDING'">Cancel</button>
-                        <button class="button-primary" v-else-if="role=='DELIVERY' && result.status=='WAITING'">Request</button>
-                        <button class="button-delivered" v-else-if="role=='DELIVERY' && result.status=='TRANSPORT'">Delivered</button>
+                        <button class="button-cancel" v-if="role=='USER' && result.status=='PENDING'" @click="cancelOrder(result.id)">Cancel</button>
+                        <button class="button-primary" v-if="role=='MANAGER' && result.status=='PENDING'" @click="waitOrder(result.id)">Wait</button>
+                        <button class="button-primary" v-else-if="role=='DELIVERY' && result.status=='WAITING'" @click="requestOrder(result.id)">Request</button>
+                        <button class="button-delivered" v-else-if="role=='DELIVERY' && result.status=='TRANSPORT'" @click="deliverOrder(result.id)">Delivered</button>
                     </div>
                 </div>
             </div>
@@ -145,6 +146,55 @@ module.exports = {
     }),
 
     methods: {
+        requestOrder: function(id) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            axios.post('/delivery/request', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getOrders();
+                })
+                .catch(r => console.log(r));
+        },
+
+        waitOrder: function(id) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.put('/manager/order/wait', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getOrders();
+                })
+                .catch(r => console.log(r));
+        },
+
+        deliverOrder: function(id) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.put('/delivery/delivered', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getOrders();
+                })
+                .catch(r => console.log(r));
+        },
+
+        cancelOrder: function(id) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+            axios.delete('/users/order' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getOrders();
+                })
+                .catch(r => console.log(r));
+        },
+
         getRole: function() {
             if(!localStorage.jws) {
                 return;

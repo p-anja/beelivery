@@ -1,6 +1,7 @@
 package beelivery.user.controller;
 
 import beelivery.Application;
+import beelivery.order.service.OrderService;
 import beelivery.restaurant.dto.ManagerRestaurantResponse;
 import beelivery.restaurant.service.RestaurantService;
 import beelivery.user.dto.ArticleRequest;
@@ -26,10 +27,12 @@ import static spark.Spark.*;
 public class ManagerController {
     private UserService service;
     private RestaurantService restaurantService;
+    private OrderService orderService;
 
-    public ManagerController(UserService service, RestaurantService restaurantService) {
+    public ManagerController(UserService service, RestaurantService restaurantService, OrderService orderService) {
         this.service = service;
         this.restaurantService = restaurantService;
+        this.orderService = orderService;
 
         delete("/manager/restaurant/article/:name", (req, res) -> {
             try {
@@ -47,6 +50,22 @@ public class ManagerController {
                     ? ok("Deleted", res)
                     : badRequest("Not deleted", res);
             } catch (Exception e) {
+                return internal(res);
+            }
+        });
+
+        put("/manager/order/wait", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String id = req.body();
+                return orderService.toWait(id)
+                    ? ok("Changed to WAITING", res)
+                    : badRequest("Not changed", res);
+            } catch(Exception e) {
                 return internal(res);
             }
         });

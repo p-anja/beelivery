@@ -29,6 +29,26 @@ public class UserController {
     public UserController(UserService service) {
         this.service = service;
 
+        delete("/user/order/:id", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String id = req.params(":id");
+                if(id == null || id.isBlank()) {
+                    return badRequest("Not canceled", res);
+                }
+
+                return service.cancelOrder((Regular) u.get(), id)
+                    ? ok("Canceled", res)
+                    : badRequest("Not canceled", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
         delete("/user/cart/:aname", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req, ERole.REGULAR);
@@ -134,7 +154,7 @@ public class UserController {
 
         get("/user/order", (req, res) -> {
             try {
-                Optional<User> u = service.validateJWS(req, ERole.REGULAR);
+                Optional<User> u = service.validateJWS(req);
                 if(!u.isPresent()) {
                     return forbidden(res);
                 }

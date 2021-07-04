@@ -1,6 +1,7 @@
 package beelivery.user.service;
 
 import beelivery.misc.JwtUtil;
+import beelivery.order.model.EOrderStatus;
 import beelivery.order.model.Order;
 import beelivery.order.service.OrderService;
 import beelivery.restaurant.model.Article;
@@ -97,8 +98,36 @@ public class UserService {
 
         r.addOrder(orderService.createOrder(r.getCart(), rest.get(), r.getUsername(),
             r.getFirstName(), r.getLastName()));
+
+        r.addPoints(r.getCart().getPrice() / 1000 * 133);
         r.getCart().clear();
+
         return repository.update(r);
+    }
+
+    public boolean cancelOrder(Regular r, String orderId) {
+        double orderPrice = orderService.cancel(orderId);
+        if(orderPrice <= 0.0) {
+            return false;
+        }
+
+        r.subtractPoints(orderPrice / 1000 * 133 * 4);
+        return updateUser(r);
+    }
+
+    public boolean requestOrder(Delivery d, String orderId) {
+        Optional<Order> o = orderService.get(orderId);
+        if(!o.isPresent() || !o.get().getStatus().equals(EOrderStatus.WAITING)) {
+            return false;
+        }
+
+        Optional<User> u = getByUsername(o.get().getRestaurant().getManagerUsername());
+        if(!u.isPresent() || !u.get().getRole().equals(ERole.MANAGER)) {
+            return false;
+        }
+        Manager m = (Manager) u.get();
+        m.addRequest(new DeliveryRequest(orderId, d.getUsername()));
+        return true;
     }
 
     public List<Order> getUserOrders(User user) {
