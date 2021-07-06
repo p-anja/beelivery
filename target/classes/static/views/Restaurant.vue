@@ -17,7 +17,7 @@
                         <div class="spacer"></div>
                         <div id="score-and-buy">
                             <b id="rest-score">{{restaurant.avgScore}}/5.0</b>
-                            <router-link :to="'/order/' + restaurant.name" class="button button-primary">Order</router-link>
+                            <router-link v-if="isRegular" :to="'/order/' + restaurant.name" class="button button-primary">Order</router-link>
                         </div>
                     </div>
                     <div id="location">
@@ -53,7 +53,6 @@
                                                 <b>{{article.articleType}}</b>
                                                 <p>{{article.description}}</p>
                                                 <b>{{article.price}} &#8364;</b>
-                                                <b>{{article.edit}}</b>
                                             </div>
                                             <div class="spacer"></div>
                                             <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
@@ -178,6 +177,7 @@ module.exports = {
         allowedToComment: false,
         isManager: false,
         isAdmin: false,
+        isRegular: false,
         review: {
             rating: 1,
             body: '',
@@ -217,6 +217,7 @@ module.exports = {
                 lat: 45.2408613,
                 lon: 19.8360667,
             },
+            articles: [],
         },
     }),
 
@@ -305,6 +306,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         })
@@ -331,6 +335,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         })
@@ -389,6 +396,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         });
@@ -435,7 +445,7 @@ module.exports = {
                             });
                     }
                     if(r.data == 'REGULAR') {
-                        // TODO can comment
+                        this.isRegular = true;
                     }
                 })
         },

@@ -10,6 +10,7 @@ public class Regular extends User {
     private Cart cart;
     private double points;
     private EMemberType memberType;
+    private boolean suspicious;
     private int cancelCount;
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate, double points, EMemberType memberType) {
@@ -20,6 +21,7 @@ public class Regular extends User {
         this.orders = new ArrayList<String>();
         this.cancelCount = 0;
         this.blocked = false;
+        this.suspicious = false;
     }
 
     public Regular(String username, String password, String firstName, String lastName, ESex sex, Date birthDate) {
@@ -30,10 +32,22 @@ public class Regular extends User {
         this.orders = new ArrayList<String>();
         this.cancelCount = 0;
         this.blocked = false;
+        this.suspicious = false;
+    }
+
+    public boolean isSuspicious() {
+        return suspicious;
+    }
+
+    public void setSuspicious(boolean suspicious) {
+        this.suspicious = suspicious;
     }
 
     public void incCancelCount() {
         ++cancelCount;
+        if(cancelCount > 5) {
+            suspicious = true;
+        }
     }
 
     public int getCancelCount() {

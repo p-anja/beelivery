@@ -104,7 +104,7 @@ public class UserService {
 
     public Optional<String> login(LoginRequest req) {
         Optional<User> u = repository.get(req.getUsername());
-        if (!u.isPresent() || !u.get().getPassword().equals(req.getPassword())) {
+        if (!u.isPresent() || !u.get().getPassword().equals(req.getPassword()) || u.get().isBlocked()) {
             return Optional.empty();
         }
 

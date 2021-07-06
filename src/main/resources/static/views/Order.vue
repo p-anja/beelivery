@@ -152,7 +152,7 @@ module.exports = {
             let res = 0.0;
             this.articles.forEach(a => {
                 if(a.selected) {
-                    res += a.price * a.amount;
+                    res += a.price * a.count;
                 }
             });
             return res;

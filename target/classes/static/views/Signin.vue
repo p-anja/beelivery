@@ -55,7 +55,13 @@ module.exports = {
                     localStorage.jws = r.data;
                     this.$router.push('/');
                 })
-                .catch(() => this.errors.signin = 'Invalid username or password');
+                .catch(r => {
+                    if(r.data == 'BLOCKED') {
+                        this.errors.signin = 'User blocked';
+                    } else {
+                        this.errors.signin = 'Invalid username or password'
+                    }
+                });
         }
     },
 };

@@ -27,7 +27,7 @@ public class Restaurant implements IIdentifiable<Integer> {
         this.address = address;
         this.logoFilepath = logoFilepath;
         this.status = status;
-        this.avgScore = 0.0;
+        this.avgScore = 1.0;
     }
 
     public Restaurant(String name, List<Article> articles, ERestType restType, Address address, String logoFilepath, ERestStatus status) {
@@ -37,7 +37,7 @@ public class Restaurant implements IIdentifiable<Integer> {
         this.address = address;
         this.logoFilepath = logoFilepath;
         this.status = status;
-        this.avgScore = 0.0;
+        this.avgScore = 1.0;
     }
 
     public Restaurant(String name, ERestType restType, Address address, String logoFilepath, ERestStatus status) {
@@ -47,7 +47,7 @@ public class Restaurant implements IIdentifiable<Integer> {
         this.address = address;
         this.logoFilepath = logoFilepath;
         this.status = status;
-        this.avgScore = 0.0;
+        this.avgScore = 1.0;
     }
 
     public void addArticle(Article a) {

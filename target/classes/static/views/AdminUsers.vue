@@ -29,7 +29,7 @@
             <div id="user-cards">
                 <div v-for="user in sortedResults" :key="user.username" class="user-card">
                     <div class="user-header">
-                        <h3 :class="user.cancelCount >= 5 ? 'suspicious' : ''">{{user.username}}</h3>
+                        <h3 :class="user.suspicious ? 'suspicious' : ''">{{user.username}}</h3>
                         <p>{{user.firstName}} {{user.lastName}}</p>
                         <b class="role">{{user.role}}</b>
                         <b v-if="user.memberType" :class="user.memberType.toLowerCase()">{{user.memberType}}</b>
