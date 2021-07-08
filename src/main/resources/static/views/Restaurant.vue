@@ -305,6 +305,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         })
@@ -331,6 +334,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         })
@@ -389,6 +395,9 @@ module.exports = {
                 .then(() => {
                     this.getRestaurant().then(r => {
                         this.restaurant = r.data;
+                        if(!this.restaurant.articles) {
+                            this.restaurant.articles = [];
+                        }
                         this.restaurant.articles.forEach(a => {
                             a.edit = false;
                         });
@@ -498,6 +507,9 @@ module.exports = {
     computed: {
         articles: function() {
             if(this.restaurant) {
+                if(!this.restaurant.articles) {
+                    return [];
+                }
                 return this.restaurant.articles.filter(a => !a.deleted);
             }
             return [];

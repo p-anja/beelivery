@@ -38,7 +38,7 @@
         <div id="find-more">
             <div id="find-more-container">
                 <h2>Find more restaurants of your liking</h2>
-                <router-link tag="button" to="/restsearch">Search</router-link>
+                <button @click="$router.push('/restsearch')">Search</button>
             </div>
         </div>
     </div>

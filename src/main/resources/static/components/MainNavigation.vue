@@ -4,12 +4,12 @@
 			<div id="nav" :class="{sticky:active}">
 				<div class="nav-container" :class="toggleNavClass()">
 					<div class="navbar-item logo">
-						<img src="img/beelogo.svg" alt="bee" width="32px" height="32px">
+						<img src="img/beelogo.png" alt="bee" width="32px" height="32px">
 						<router-link id="logo" to="/">beelivery</router-link>
 					</div>
-					<div id="search">
+					<div id="nav-search">
 						<!-- Search text field -->
-						<div id="search-container">
+						<div id="nav-search-container">
 							<input placeholder="Search restaurants" type="text" v-model="search" @keyup.enter="$router.push('/restsearch/' + search)">
 							<span class="border"></span>
 						</div>
@@ -211,33 +211,33 @@
 		font-weight: 600;
 	}
 
-	#search {
+	#nav-search {
 		display: grid;
 		place-items: center;
 	}
 
-	#search-container {
+	#nav-search-container {
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
 	}
 
-	#search-container input {
+	#nav-search-container input {
 		border: 0px;
 		border-bottom: solid 1px #eee;
 		padding: 0px;
 		margin: 0px;
 	}
 
-	#search-container input ~ .border {
+	#nav-search-container input ~ .border {
 		position: absolute;
 		bottom: 0;
 		left: 0;
 		width: 0;
 	}
 
-	#search input:focus ~ .border {
+	#nav-search input:focus ~ .border {
 		width: 100%;
 		transition: 0.5s;
 		border: solid 1px var(--accent);

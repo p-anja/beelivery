@@ -3,7 +3,7 @@
         <main-navigation></main-navigation>
         <div id="search-main">
             <div id="search-container">
-                <input type="text" placeholder="Name" @keyup.enter="search" v-model="name">
+                <input type="text" placeholder="Name" @keyup.enter="search('')" v-model="name">
                 <div id="sort-container">
                     <p @click="sort('name')">Name <span v-if="sortBy == 'name'" v-html="sortSymbol"></span></p>
                     <p @click="sort('address.city')">City <span v-if="sortBy == 'address.city'" v-html="sortSymbol"></span></p>
@@ -120,7 +120,7 @@ module.exports = {
         selectedFilters: [],
     }),
     methods: {
-        search: function() {
+        search: function(routeName) {
             this.results = [];
             let type = '';
             let city = '';
@@ -140,6 +140,9 @@ module.exports = {
                     avgScore = f.value;
                 }
             });
+            if(routeName) {
+                this.name = routeName;
+            }
             let query = '?name=' + this.name + '&type=' + type + '&state=' + state + '&city=' + city + '&score=' + avgScore;
             axios.get('/restaurant' + query)
                 .then(r => this.results = r.data)
@@ -199,7 +202,7 @@ module.exports = {
         },
     },
     mounted() {
-        this.search();
+        this.search(this.$route.params.name);
     },
 };
 </script>
