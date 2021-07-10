@@ -103,7 +103,7 @@ public class RestaurantService {
         return Optional.of(r);
     }
 
-    public List<Restaurant> search(String name, String type, String state, String city, String avgScoreString) {
+    public List<Restaurant> search(String name, String type, String state, String city, String avgScoreString, String onlyOpen) {
         List<Restaurant> res = repository.getAll();
         if(name != null && !name.isBlank()) {
             res = res.stream().filter(r -> r.getName().toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
@@ -122,6 +122,11 @@ public class RestaurantService {
             final double avgScore = Double.parseDouble(avgScoreString);
             res = res.stream().filter(r -> r.getAvgScore() >= avgScore).collect(Collectors.toList());
         }
+
+        if(onlyOpen != null && !onlyOpen.isBlank()) {
+            res = res.stream().filter(r -> r.getStatus().equals(ERestStatus.OPEN)).collect(Collectors.toList());
+        }
+
         return res;
     }
 

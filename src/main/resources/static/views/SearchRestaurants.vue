@@ -56,6 +56,7 @@
 module.exports = {
     data: () => ({
         name: '',
+        onlyOpen: false,
         sortBy: 'name',
         sortDirection: 'asc',
         results: [
@@ -144,6 +145,9 @@ module.exports = {
                 this.name = routeName;
             }
             let query = '?name=' + this.name + '&type=' + type + '&state=' + state + '&city=' + city + '&score=' + avgScore;
+            if(this.onlyOpen) {
+                query += '&open=' + 't';
+            }
             axios.get('/restaurant' + query)
                 .then(r => this.results = r.data)
                 .catch(r => console.log(r));
@@ -157,18 +161,24 @@ module.exports = {
         },
 
         openCompare: function(a, b) {
-            if(a.status!='Open' && b.status=='Open') {
+            if(a.status.toUpperCase()!='OPEN' && b.status.toUpperCase()=='OPEN') {
                 return 1;
             }
-            return 0;
+            return -1;
         },
 
         removeFilter: function(i) {
+            if(this.selectedFilters[i].text == 'Only open') {
+                this.onlyOpen = false;
+            }
             this.filters.push(this.selectedFilters.splice(i, 1)[0]);
         },
 
         selectFilter: function() {
             // let value = e.target.value;
+            if(this.selectedFilter.text == 'Only open') {
+                this.onlyOpen = true;
+            }
             this.selectedFilters.push(this.selectedFilter);
             this.filters.splice(this.filters.indexOf(this.selectedFilter), 1);
             this.selectedFilter = '';

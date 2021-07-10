@@ -1,7 +1,7 @@
 <template>
     <div id="customers-main">
         <div id="customers-container">
-            <h2>Delivery requests</h2>
+            <h2>Customers</h2>
             <div id="customers">
                 <div v-for="customer in customers" :key="customer.username" class="customer">
                     <div class="customer-info">

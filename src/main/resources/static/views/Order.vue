@@ -11,7 +11,7 @@
                             <div :class="article.selected ? 'article-info selected' : 'article-info'">
                                 <div @click="article.selected = !article.selected" class="article-header">
                                     <h3>
-                                        {{article.name}} ({{article.amount}} <span v-if="article.artileType == 'FOOD'">g</span> <span v-else>ml</span>)
+                                        {{article.name}} ({{article.amount}} <span v-if="article.articleType == 'FOOD'">g</span> <span v-else>ml</span>)
                                     </h3>
                                     <p>{{article.description}}</p>
                                 </div>

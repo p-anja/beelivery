@@ -17,7 +17,7 @@
                         <div class="spacer"></div>
                         <div id="score-and-buy">
                             <b id="rest-score">{{restaurant.avgScore}}/5.0</b>
-                            <router-link :to="'/order/' + restaurant.name" class="button button-primary">Order</router-link>
+                            <router-link v-if="isRegular && restaurant.status == 'OPEN'" :to="'/order/' + restaurant.name" class="button button-primary">Order</router-link>
                         </div>
                     </div>
                     <div id="location">
@@ -43,9 +43,9 @@
                                     <div v-for="article in articles" :key="article.name">
                                         <div v-if="!article.edit" class="article">
                                             <div class="article-info">
-                                                <h3>{{article.name}} {{article.articleAmount}}
-                                                    <span v-if="article.articleType == 'FOOD'">g</span>
-                                                    <span v-else>ml</span>
+                                                <h3>{{article.name}} {{article.amount}}
+                                                    <span v-if="article.articleType == 'FOOD' && article.amount">g</span>
+                                                    <span v-else-if="article.articleType == 'DRINK' && article.amount">ml</span>
                                                     <span v-if="isManager" @click="editArticle(article, true)" class="edit-article-pencil">
                                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                                     </span>
@@ -101,7 +101,7 @@
                                             <input type="number" :placeholder="articleType == 'DRINK' ? 'Amount (ml)' : 'Amount (g)'"
                                                 v-model="articleAmount"
                                                 min="1"
-                                                 @blur="articleAmount = articleAmount < 1 ? 1 : articleAmount">
+                                                 @blur="articleAmount = article.Amount < 1 ? 1 : article.Amount">
                                         </div>
                                         <div id="new-article-profile">
                                             <b class="error">{{errors.articleProfile}}</b>
@@ -161,6 +161,7 @@
 
 module.exports = {
     data: () => ({
+        isRegular: false,
         imgKey: 1,
         articleName: '',
         articlePrice: '',
@@ -444,7 +445,9 @@ module.exports = {
                             });
                     }
                     if(r.data == 'REGULAR') {
-                        // TODO can comment
+                        this.isRegular = true;
+                        this.isManager = false;
+                        this.isAdmin = false;
                     }
                 })
         },

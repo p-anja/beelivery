@@ -48,7 +48,7 @@
                     <div class="result-action">
                         <b>{{result.price}} &#8364;</b>
                         <div class="spacer"></div>
-                        <button class="button-cancel" v-if="role=='USER' && result.status=='PENDING'" @click="cancelOrder(result.id)">Cancel</button>
+                        <button class="button-cancel" v-if="role=='REGULAR' && result.status=='PENDING'" @click="cancelOrder(result.id)">Cancel</button>
                         <button class="button-primary" v-if="role=='MANAGER' && result.status=='PENDING'" @click="waitOrder(result.id)">Wait</button>
                         <button class="button-primary" v-else-if="role=='DELIVERY' && result.status=='WAITING'" @click="requestOrder(result.id)">Request</button>
                         <button class="button-delivered" v-else-if="role=='DELIVERY' && result.status=='TRANSPORT'" @click="deliverOrder(result.id)">Delivered</button>
@@ -188,7 +188,7 @@ module.exports = {
                 this.$router.push('/');
                 return;
             }
-            axios.delete('/users/order' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+            axios.delete('/user/order/' + id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
                 .then(() => {
                     this.getOrders();
                 })

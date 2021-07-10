@@ -19,14 +19,7 @@
                         <h3>{{restaurant.name}}</h3>
                         <b :class="restaurant.status.toLowerCase()">{{restaurant.status}}</b>
                         <b class="card-type">{{restaurant.restType}}</b>
-                        <input
-                            class="rating"
-                            max="5"
-                            oninput="this.style.setProperty('--value', this.value)"
-                            step="0.5"
-                            type="range"
-                            :value="Math.round(restaurant.avgScore*2)/2"
-                            disabled>
+                        <b>Rating: {{restaurant.avgScore.toFixed(2)}} / 5.0</b>
                     </div>
                     <div class="spacer"></div>
                     <div class="card-actions">
