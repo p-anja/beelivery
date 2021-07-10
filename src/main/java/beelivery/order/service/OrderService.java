@@ -71,9 +71,18 @@ public class OrderService {
             : -1.0;
     }
 
-    public boolean toWait(String id) {
+    public boolean toPrepare(String id) {
         Optional<Order> order = repository.get(id);
         if(!order.isPresent() || !order.get().getStatus().equals(EOrderStatus.PENDING)) {
+            return false;
+        }
+        order.get().setStatus(EOrderStatus.PREPARING);
+        return repository.update(order.get());
+    }
+
+    public boolean toWait(String id) {
+        Optional<Order> order = repository.get(id);
+        if(!order.isPresent() || !order.get().getStatus().equals(EOrderStatus.PREPARING)) {
             return false;
         }
         order.get().setStatus(EOrderStatus.WAITING);

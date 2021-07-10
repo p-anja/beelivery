@@ -88,6 +88,22 @@ public class ManagerController {
             }
         });
 
+        put("/manager/order/prepare", (req, res) -> {
+            try {
+                Optional<User> u = service.validateJWS(req, ERole.MANAGER);
+                if(!u.isPresent()) {
+                    return forbidden(res);
+                }
+
+                String id = req.body();
+                return orderService.toPrepare(id)
+                    ? ok("Changed to PREPARING", res)
+                    : badRequest("Not changed", res);
+            } catch(Exception e) {
+                return internal(res);
+            }
+        });
+
         put("/manager/restaurant/article", (req, res) -> {
             try {
                 Optional<User> u = service.validateJWS(req, ERole.MANAGER);

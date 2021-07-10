@@ -49,7 +49,8 @@
                         <b>{{result.price}} &#8364;</b>
                         <div class="spacer"></div>
                         <button class="button-cancel" v-if="role=='REGULAR' && result.status=='PENDING'" @click="cancelOrder(result.id)">Cancel</button>
-                        <button class="button-primary" v-if="role=='MANAGER' && result.status=='PENDING'" @click="waitOrder(result.id)">Wait</button>
+                        <button class="button-primary" v-if="role=='MANAGER' && result.status=='PENDING'" @click="prepareOrder(result.id)">Prepare</button>
+                        <button class="button-primary" v-if="role=='MANAGER' && result.status=='PREPARING'" @click="waitOrder(result.id)">Wait</button>
                         <button class="button-primary" v-else-if="role=='DELIVERY' && result.status=='WAITING'" @click="requestOrder(result.id)">Request</button>
                         <button class="button-delivered" v-else-if="role=='DELIVERY' && result.status=='TRANSPORT'" @click="deliverOrder(result.id)">Delivered</button>
                     </div>
@@ -146,6 +147,19 @@ module.exports = {
     }),
 
     methods: {
+        prepareOrder: function(id) {
+            if(!localStorage.jws) {
+                this.$router.push('/');
+                return;
+            }
+
+            axios.put('/manager/order/prepare', id, {headers: {'Authorization': 'Bearer ' + localStorage.jws}})
+                .then(() => {
+                    this.getOrders();
+                })
+                .catch(r => console.log(r));
+        },
+
         requestOrder: function(id) {
             if(!localStorage.jws) {
                 this.$router.push('/');
