@@ -127,8 +127,7 @@ module.exports = {
         validateInputs: function() {
             let usernameValid = !!this.user.username;
             let oldPasswordValid = !!this.oldPassword && this.oldPassword.length >= 8;
-            let newPasswordValid = !!this.newPassword && this.newPassword.length >= 8;
-            let passwordsMatch = this.oldPassword == this.newPassword;
+            let newPasswordValid = !this.newPassword || this.newPassword.length >= 8;
             let firstNameValid = !!this.user.firstName;
             let lastNameValid = !!this.user.lastName;
             let birthDateValid = !!this.user.birthDate || new Date(Date.parse(this.user.birthDate)) > new Date();
@@ -138,7 +137,6 @@ module.exports = {
             this.errors.lastName = lastNameValid ? '' : 'Last name required';
             this.errors.birthDate = birthDateValid ? '' : 'Must be before today';
             this.errors.oldPassword = oldPasswordValid ? '' : "Minimum 8 characters";
-            this.errors.newPassword = newPasswordValid ? '' : "Minimum 8 characters";
             return usernameValid && oldPasswordValid && newPasswordValid
                 && firstNameValid && lastNameValid && birthDateValid;
         },

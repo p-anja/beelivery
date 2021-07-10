@@ -128,7 +128,8 @@ public class UserService {
                 r.setSex(req.getSex());
                 r.setFirstName(req.getFirstName());
                 r.setLastName(req.getLastName());
-                r.setPassword(req.getPassword());
+                if(req.getPassword() != null && !req.getPassword().isBlank() && req.getPassword().length() >= 8)
+                    r.setPassword(req.getPassword());
                 return repository.update(r);
             }
         }
