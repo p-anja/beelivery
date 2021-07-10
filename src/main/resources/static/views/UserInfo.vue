@@ -137,16 +137,10 @@ module.exports = {
             this.errors.firstName = firstNameValid ? '' : 'First name required';
             this.errors.lastName = lastNameValid ? '' : 'Last name required';
             this.errors.birthDate = birthDateValid ? '' : 'Must be before today';
-            if (!passwordsMatch) {
-                this.errors.oldPassword = "Passwords must match";
-                this.errors.newPassword = "Passwords must match";
-            }
             this.errors.oldPassword = oldPasswordValid ? '' : "Minimum 8 characters";
             this.errors.newPassword = newPasswordValid ? '' : "Minimum 8 characters";
-
             return usernameValid && oldPasswordValid && newPasswordValid
-                && passwordsMatch && firstNameValid && lastNameValid
-                && birthDateValid;
+                && firstNameValid && lastNameValid && birthDateValid;
         },
 
         updateInfo: function() {

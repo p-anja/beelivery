@@ -53,7 +53,6 @@
                                                 <b>{{article.articleType}}</b>
                                                 <p>{{article.description}}</p>
                                                 <b>{{article.price}} &#8364;</b>
-                                                <b>{{article.edit}}</b>
                                             </div>
                                             <div class="spacer"></div>
                                             <img :src="'http://localhost:8080/image/' + article.imageFilepath" alt="article pic">
