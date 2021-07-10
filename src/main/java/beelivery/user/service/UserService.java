@@ -120,20 +120,14 @@ public class UserService {
         if (!u.isPresent()) {
             return false;
         }
-
-        switch(u.get().getRole()) {
-            case REGULAR: {
-                Regular r = (Regular) u.get();
-                r.setBirthDate(req.getBirthDate());
-                r.setSex(req.getSex());
-                r.setFirstName(req.getFirstName());
-                r.setLastName(req.getLastName());
-                if(req.getPassword() != null && !req.getPassword().isBlank() && req.getPassword().length() >= 8)
-                    r.setPassword(req.getPassword());
-                return repository.update(r);
-            }
-        }
-        return false;
+        User r = u.get();
+        r.setBirthDate(req.getBirthDate());
+        r.setSex(req.getSex());
+        r.setFirstName(req.getFirstName());
+        r.setLastName(req.getLastName());
+        if(req.getPassword() != null && !req.getPassword().isBlank() && req.getPassword().length() >= 8)
+            r.setPassword(req.getPassword());
+        return repository.update(r);
     }
 
     public Optional<User> validateJWS(Request req) {
